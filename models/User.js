@@ -5,7 +5,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    name:{
+    firstname:{
+        type: String,
+        required: true
+    },
+    lastname:{
         type: String,
         required: true
     },
@@ -31,10 +35,6 @@ const UserSchema = new mongoose.Schema({
     },
     birthdate:{
         type: Date,
-        required: true
-    },
-    secret_word:{
-        type: String,
         required: true
     },
     date:{
