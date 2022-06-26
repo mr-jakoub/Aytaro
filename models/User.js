@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
 
 const UserSchema = new mongoose.Schema({
-    account_type:{
+    accountType:{
         type: String,
-        required: true
+        required: true,
+        default: 'Personal'// Or Business
     },
     firstname:{
         type: String,
