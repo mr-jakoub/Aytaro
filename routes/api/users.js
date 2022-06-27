@@ -6,9 +6,16 @@ const User = require('../../models/User')
 const config = require('config')
 const { check, validationResult } = require('express-validator')
 
-
-
-
+router.post('/', [
+    check('firstname','First name is required').not().isEmpty(),
+    check('lastname','Last name is required').not().isEmpty(),
+    check('email','Please include a valid email address').isEmail(),
+    check('password','Password must be at least 6 characters').isLength({ min: 6 }),
+    check('gender','Gender is required').not().isEmpty(),
+    check('birthdate','Please include a valid birthdate').isDate({format: 'DD-MM-YYYY'})
+], async (req,res) =>{
+    
+})
 
 // @route   GET api/users/recent
 // @desc    Get recent users

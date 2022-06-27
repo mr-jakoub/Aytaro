@@ -3,8 +3,7 @@ const mongoose = require('mongoose')
 const UserSchema = new mongoose.Schema({
     accountType:{
         type: String,
-        required: true,
-        default: 'Personal'// Or Business
+        default: 'Personal'
     },
     firstname:{
         type: String,
@@ -25,6 +24,7 @@ const UserSchema = new mongoose.Schema({
     },
     phone:{
         type: Number,
+        required: true,
         default: 0
     },
     gender:{
