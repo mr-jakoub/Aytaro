@@ -1,5 +1,5 @@
 {
-    "aytaroURI": "mongodb+srv://aytaro:AD4M6RQ7E81@aytaro.1gcisnb.mongodb.net/?retryWrites=true&w=majority",
+    "aytaroURI": "mongodb+srv://aytaro:AD4M6RQ7E81@aytaro.1gcisnb.mongodb.net/aytaro?retryWrites=true&w=majority",
     "jwtSecret": "AD4M6RQ7E81",
     "jwtExpiresIn": 360000000000
 }
