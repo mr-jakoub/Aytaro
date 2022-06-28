@@ -5,11 +5,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: 'Personal'
     },
-    firstname:{
-        type: String,
-        required: true
-    },
-    lastname:{
+    name:{
         type: String,
         required: true
     },

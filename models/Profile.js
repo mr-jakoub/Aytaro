@@ -29,6 +29,14 @@ const ProfileSchema = new mongoose.Schema({
             }
         }
     ],
+    following:[
+        {
+            user:{
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        }
+    ],
     rises:[
         {
             user:{
