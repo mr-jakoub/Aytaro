@@ -134,7 +134,7 @@ router.post('/',[ auth, [
     if(skills) profileFields.skills = skills.split(',').map(skill=>skill.trim())
 
     try{
-        profile = await Profile.findOneAndUpdate({ user: req.user.id }, { $set: profileFields }, { upsert: true, new: true }).populate('user',['name', 'avatar', 'email', 'phone', 'accountType'])
+        const profile = await Profile.findOneAndUpdate({ user: req.user.id }, { $set: profileFields }, { upsert: true, new: true }).populate('user',['name', 'avatar', 'email', 'phone', 'accountType'])
         await User.findOneAndUpdate({ _id: req.user.id }, { $set: userFields }, { upsert: true, new: true })
         return res.json(profile)
     } catch (err) {
