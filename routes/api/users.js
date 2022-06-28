@@ -14,6 +14,7 @@ const { check, validationResult } = require('express-validator')
 router.post('/', [
     check('name','Name is required').not().isEmpty(),
     check('email','Please include a valid email address').isEmail(),
+    check('phone','Please include a valid phone number').isMobilePhone(),
     check('password','Password must be at least 6 characters').isLength({ min: 6 }),
     check('gender','Gender is required').not().isEmpty(),
     check('birthdate','Please include a valid birthdate').isDate({format: 'YYYY-MM-DD'})
@@ -78,14 +79,13 @@ router.post('/', [
 // @access  public
 router.get('/recent', async (req,res)=>{
     try {
-        const users = await User.find().sort({ date:-1 }).select('avatar') // Get the recent users
+        const users = await User.find().sort({ date:-1 }).select('avatar') // Get recent users
         res.json(users)
     } catch (err) {
         console.log(err.message)
         res.status(500).send('Server Error')
     }
 })
-
 
 // @route   DELETE api/users
 // @desc    DELETE user

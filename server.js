@@ -1,5 +1,6 @@
 const express = require('express')
 const connectDB = require('./config/db')
+const fileUpload = require('express-fileupload')
 
 const app = express()
 
@@ -8,6 +9,8 @@ connectDB()
 
 // Init Middleware /* to allow req.body */
 app.use(express.json({extended: false}))
+// Upload files
+app.use(fileUpload({ limits: { fileSize: 1024 * 1024 * 5 /* 5MB */ }, createParentPath: true }))
 
 app.get('/', (req, res)=> res.send('API Running'))
 
