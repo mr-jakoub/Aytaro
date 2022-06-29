@@ -14,6 +14,7 @@ router.post('/', [ auth, [
     check('categories','Include at least one category please').not().isEmpty(),
     check('languages','Include at least one language please').not().isEmpty(),
     check('price','Course price is required').not().isEmpty(),
+    check('sections','Course price is required').not().isEmpty(),
 
 ] ], async (req,res)=>{
     const errors = validationResult(req)
@@ -33,8 +34,8 @@ router.post('/', [ auth, [
         if(categories) courseFields.categories = categories.split(',').map(category=>category.trim())
         if(languages) courseFields.languages = languages.split(',').map(language=>language.trim())
         if(requirements) courseFields.requirements = requirements.split(',').map(requirement=>requirement.trim())
-        // Build sections
-
+        // Build sections [{...},{...}]
+        courseFields.sections = sections
         const newCourse = new Course(courseFields)
         const course = await newCourse.save()
         res.json(course)
