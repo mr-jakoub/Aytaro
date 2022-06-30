@@ -118,6 +118,10 @@ const CourseSchema = new Schema({
                     },
                     duration:{
                         type: Number
+                    },
+                    public:{
+                        type: Boolean,
+                        default: false
                     }
                 }
             ],
