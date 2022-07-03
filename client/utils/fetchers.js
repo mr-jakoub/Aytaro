@@ -13,8 +13,14 @@ export const loadUser = async() =>{
 
 }
 
+export const getCourses = async() =>{
+  const resCourses = await axios.get('http://localhost:5000/api/courses')
+  return resCourses.data
+}
+
 const fetchers = {
-  loadUser
+  loadUser,
+  getCourses
 }
 
 export default fetchers

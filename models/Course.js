@@ -41,6 +41,12 @@ const CourseSchema = new Schema({
     coupon:{
         type: String
     },
+    avatar:{
+        type: String
+    },
+    name:{
+        type: String
+    },
     stars:[
         {
             user:{

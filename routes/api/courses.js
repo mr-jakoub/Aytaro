@@ -27,7 +27,7 @@ router.post('/', [ auth, [
         const user = await User.findById(req.user.id).select('-password')
         const { title, description, categories, languages, requirements, price, coupon, sections } = req.body
         // Fill Course fields
-        const courseFields = { user: user.id, title, description, price, coupon }
+        const courseFields = { user: user.id, avatar: user.avatar, name: user.name, title, description, price, coupon }
         for(const [key, value] of Object.entries(courseFields)) {
             if (value && value.length > 0) {
                 courseFields[key] = value
