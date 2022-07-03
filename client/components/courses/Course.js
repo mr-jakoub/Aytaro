@@ -5,10 +5,12 @@ import sinceDate from '../../utils/sinceDate'
 import textCheck from '../../utils/textCheck'
 import { useStateContext } from '../../context/StateContext'
 import userNameHandler from '../../utils/userNameHandler'
+import useSWR from 'swr'
+import fetchers from '../../utils/fetchers'
 
 
 const Course = ({course, addComment, comments, profileCourses = false, deleteCourse, addLike, addRise}) => {
-    const { user } = useStateContext().state
+    const user = useSWR('/api/auth', fetchers.loadUser).data
     const [dropDown, setDropDown] = useState({
         type: '',
         courseId: ''
@@ -88,7 +90,7 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
                     </svg>
                 </span>
                 <ul className={dropDown.type && (course._id === dropDown.courseId) ? "show":''}>
-                        {user._id !== course.user ? (
+                        {user && user._id !== course.user ? (
                             <>
                                 <li className="svg-icon">
                                     <svg style={{width: '28px', height: '28px', marginLeft: '-5px'}} viewBox="0 0 25 25">

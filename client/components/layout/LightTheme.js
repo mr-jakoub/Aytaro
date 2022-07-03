@@ -2,6 +2,7 @@ const LightTheme = ()=> {
     if (process.browser) {
         document.documentElement.style.setProperty('--White-color', '#ffffff')
         document.documentElement.style.setProperty('--White-color-secondary', '#f0f2f5')
+        document.documentElement.style.setProperty('--bluredWhite', 'rgba(255,255,255,.085)')
         document.documentElement.style.setProperty('--Dark-color', '#242526')
         document.documentElement.style.setProperty('--Light-color', '#f0f2f5')
         document.documentElement.style.setProperty('--Grey-color', '#808388')

@@ -2,6 +2,7 @@ const DarkTheme = ()=> {
     if (process.browser) {
     document.documentElement.style.setProperty('--White-color', '#1a1a1a')
     document.documentElement.style.setProperty('--White-color-secondary', '#2a2b2b')
+    document.documentElement.style.setProperty('--bluredWhite', 'rgba(26,26,26,.085)')
     document.documentElement.style.setProperty('--Dark-color', '#ffffff')
     document.documentElement.style.setProperty('--Light-color', '#141414')
     document.documentElement.style.setProperty('--Grey-color', '#b0b3b8')

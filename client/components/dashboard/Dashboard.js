@@ -11,11 +11,6 @@ const Dashboard = () =>{
     const [rightAside, setRightAside] = useState(false)
     const [languesDown, setLanguesDown] = useState(false)
     const courses = useSWR('/api/courses', fetchers.getCourses).data
-
-    const user = useSWR('/api/auth', fetchers.loadUser).data
-    useEffect(()=>{
-        if(user) setStateUser(user)
-    },[])
     return courses === undefined ? <h1>Loading...</h1> :
         <>
         {/* <PopUp popupForm={popupForm} match={match} /> */}
