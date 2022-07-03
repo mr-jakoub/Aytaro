@@ -5,7 +5,7 @@ import Link from "next/link"
 
 const Navbar = ({ user }) => {
     // Start dark mode
-    const [darkMode, setDarkMode] = useState(false)
+    const [darkMode, setDarkMode] = useState(true)
     const handelDarkmode = ()=> {
         setDarkMode(!darkMode)
         if (typeof window !== 'undefined') {
@@ -14,7 +14,7 @@ const Navbar = ({ user }) => {
             }else{
                 window.localStorage.setItem('THEME_TYPE','LIGHT_MODE')
             }
-            window.localStorage.getItem('THEME_TYPE') === "DARK_MODE" ? DarkTheme() : LightTheme()
+            window.localStorage.getItem('THEME_TYPE') === "LIGHT_MODE" ? LightTheme() : DarkTheme()
         }
     }
     // End dark mode
@@ -401,8 +401,8 @@ const Navbar = ({ user }) => {
     )
 
     useEffect(()=>{
-        window.localStorage.getItem('THEME_TYPE') === "DARK_MODE" ? setDarkMode(true) : setDarkMode(false)
-        window.localStorage.getItem('THEME_TYPE') === "DARK_MODE" ? DarkTheme() : LightTheme()
+        window.localStorage.getItem('THEME_TYPE') === "LIGHT_MODE" ? setDarkMode(false) : setDarkMode(true)
+        window.localStorage.getItem('THEME_TYPE') === "LIGHT_MODE" ? LightTheme() : DarkTheme()
     },[])
     
     return (

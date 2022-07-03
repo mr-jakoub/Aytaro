@@ -1,5 +1,5 @@
 import { useContext, createContext, useState } from "react"
-import { setCookies, removeCookies } from 'cookies-next'
+import { setCookie, deleteCookie } from 'cookies-next'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import fetchers from "../utils/fetchers"
@@ -17,6 +17,7 @@ export const StateContext = ({ children }) =>{
     // Alerts
     const [alerts, setAlerts] = useState([])
     const setAlert = (alertMessage, alertType, timeout = 3000) =>{
+        setAlerts([])
         const id = uuidv4()
         setAlerts([...alerts, {id, alertMessage, alertType, timeout}])
         setTimeout(() => {
@@ -33,7 +34,7 @@ export const StateContext = ({ children }) =>{
         const body = JSON.stringify({ account_type, name, email, password, gender, birthdate, phone })
         try {
             const res = await axios.post('http://localhost:5000/api/users', body, config)
-            setCookies("token",res.data.token)
+            setCookie("token",res.data.token)
             fetchers.loadUser()
             setState({...state, user: res.data})
             setAlert('Registration completed successfully.','success')
@@ -42,7 +43,7 @@ export const StateContext = ({ children }) =>{
             if(errors){
                 errors.forEach(error => setAlert(error.msg,'danger'))
             }
-            removeCookies('token')
+            deleteCookie('token')
         }
     }
     // Login
@@ -55,7 +56,7 @@ export const StateContext = ({ children }) =>{
         const body = JSON.stringify({ email, password })
         try {
             const res = await axios.post('http://localhost:5000/api/auth',body,config)
-            setCookies("token",res.data.token)
+            setCookie("token",res.data.token)
             fetchers.loadUser()
             setState({...state, user: res.data})
             setAlert('Welcome back.','success')
@@ -64,13 +65,12 @@ export const StateContext = ({ children }) =>{
                 const errors = err.response.data.errors
                 errors.forEach(error => setAlert(error.msg,'danger'))
             }
-            console.log(err.response)
-            removeCookies('token')
+            deleteCookie('token')
         }
     }
     // Logout
     const logout = () => {
-        removeCookies('token')
+        deleteCookie('token')
         setState({...state, user: null})
         setAlert('See you next time.','success')
     }

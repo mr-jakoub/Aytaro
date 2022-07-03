@@ -152,6 +152,7 @@ a:not(.logo):hover{
   color: var(--Primary-color)
 }
 .logo{
+  color: red;
   font-weight: 400
 }
 .SEC-title{
