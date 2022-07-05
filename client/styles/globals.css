@@ -2119,14 +2119,13 @@ aside ul li .languages a{
   background: var(--Dark-color);
   z-index: -1
 }
-.content .post .footer .head .participate span{
-  color: var(--Dark-color)
-}
-.content .post .footer .head .participate svg{
-  fill: var(--Dark-color)
-}
 .content .post .footer .head .participate:hover::before{
   animation: participate 600ms ease-out forwards alternate;
+}
+.content .post .footer .head .participate:hover span,
+.content .post .footer .head .participate:hover svg{
+  fill: var(--Dark-color);
+  color: var(--Dark-color)
 }
 @keyframes participate {
   0%{

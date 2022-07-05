@@ -60,6 +60,7 @@ router.post('/', [ auth, [
 router.put('/rise/:id', auth, async (req,res)=>{
     try {
         const course = await Course.findById(req.params.id)
+        const user = await User.findById(req.user.id)
         // Check if the course has already been rised
         if(course.rises.filter(rise=> rise.user.toString() === req.user.id).length > 0){
             // Get remove index
@@ -68,7 +69,7 @@ router.put('/rise/:id', auth, async (req,res)=>{
             await course.save()
             return res.json(course.rises)
         }
-        course.rises.unshift({ user: req.user.id })
+        course.rises.unshift({ user: req.user.id, name: user.name })
         await course.save()
         res.json(course.rises)
     } catch (err) {

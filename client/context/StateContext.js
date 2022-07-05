@@ -74,6 +74,26 @@ export const StateContext = ({ children }) =>{
         setState({...state, user: null})
         setAlert('See you next time.','success')
     }
+    // Get profile by ID
+    const getProfileById = async (userId) => {
+        try {
+            const res = await axios.get(`http://localhost:5000/api/profile/${userId}`)
+            return res.data
+        } catch (err) {
+            
+        }
+    }
+    // Add rise
+    const addRise = async (courseId) => {
+        try {
+            await axios.put(`http://localhost:5000/api/courses/rise/${courseId}`)
+            
+        } catch (err) {
+            if(err.response){
+                setAlert(err.response.statusText,'danger')
+            }
+        }
+    }
 
     return(
         <Context.Provider value={{
@@ -85,7 +105,10 @@ export const StateContext = ({ children }) =>{
 
             register,
             login,
-            logout
+            logout,
+
+            getProfileById,
+            addRise
         }}>
             {children}
         </Context.Provider>
