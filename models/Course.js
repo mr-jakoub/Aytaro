@@ -47,6 +47,9 @@ const CourseSchema = new Schema({
     name:{
         type: String
     },
+    thumbnail:{
+        type: String
+    },
     stars:[
         {
             user:{

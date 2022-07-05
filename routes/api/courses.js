@@ -25,7 +25,7 @@ router.post('/', [ auth, [
     }
     try {
         const user = await User.findById(req.user.id).select('-password')
-        const { title, description, categories, languages, requirements, price, coupon, sections } = req.body
+        const { title, description, categories, languages, requirements, price, coupon, sections, thumbnail } = req.body
         // Fill Course fields
         const courseFields = { user: user.id, avatar: user.avatar, name: user.name, title, description, price, coupon }
         for(const [key, value] of Object.entries(courseFields)) {
@@ -33,6 +33,7 @@ router.post('/', [ auth, [
                 courseFields[key] = value
             }
         }
+        if(!thumbnail) courseFields.thumbnail = "/default/defaultThumbnail.jpg"
         if(categories) courseFields.categories = categories.split(',').map(category=>category.trim())
         if(languages) courseFields.languages = languages.split(',').map(language=>language.trim())
         if(requirements) courseFields.requirements = requirements.split(',').map(requirement=>requirement.trim())

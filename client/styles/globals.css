@@ -9,7 +9,7 @@
   --White-color: #ffffff;
   --White-color-secondary: #f0f2f5;
   --Light-color: #f0f2f5;
-  --Dark-color: #1a1a1a);
+  --Dark-color: #1a1a1a;
   --Black-color: #141414;
   --Grey-color: #808388;
   --Smooth-Back: rgba(0,0,0,.07);
@@ -1935,7 +1935,7 @@ aside ul li .languages a{
 .content .posts .post .dropdown ul{
   position: absolute;
   top: 45px;
-  right: 15px;
+  right: 10px;
   display: none;
   justify-content: flex-start;
   align-items: flex-start;
@@ -1954,7 +1954,7 @@ aside ul li .languages a{
   content: '';
   position: absolute;
   top: 0;
-  right: .5rem;
+  right: .8rem;
   transform: translateY(-100%);
   border-color: transparent transparent var(--White-color) transparent;
   border-style: solid;
@@ -1999,6 +1999,10 @@ aside ul li .languages a{
   padding: .3rem 0;
   z-index: 3
 }
+.content .posts .post .body img{
+  max-height: 300px;
+  width: 100%;
+}
 .content .posts .post .body .link{
   padding: .3rem 1.2rem;
   border-radius: 25px;
@@ -2015,16 +2019,19 @@ aside ul li .languages a{
   width: 15px;
   height: 15px
 }
+.content .posts .post .body p.title{
+  font-weight: bold;
+  font-size: 1em;
+}
 .content .posts .post .body p{
   font-family: Chapaza;
   letter-spacing: 1.5px;
   color: var(--Dark-color);
   line-height: 2.1rem;
-  font-size: .92em;
-  font-weight: 500;
-  min-height: 3.5rem;
+  font-size: .88em;
+  font-weight: 400;
   overflow-wrap: anywhere;
-  padding: 0 1rem;
+  padding: .5rem 1rem;
   white-space: pre-wrap;
   text-align: start;
   user-select: text
@@ -2068,7 +2075,7 @@ aside ul li .languages a{
 }
 .content .post .footer .head .react{
   cursor: pointer;
-  margin: .3rem .1rem;
+  margin: .5rem .1rem;
   padding: .3rem 1rem;
   border-radius: var(--Radius-xs);
   transform: scale(1);
@@ -2081,8 +2088,8 @@ aside ul li .languages a{
   background: var(--Smooth-Back)
 }
 .content .post .footer .head .react svg{
-  width: 23px;
-  height: 23px;
+  width: 25px;
+  height: 25px;
   fill: var(--Grey-color);
   margin-right: .18rem
 }
@@ -2097,6 +2104,43 @@ aside ul li .languages a{
   font-weight: 600;
   user-select: none;
   font-weight: bolder
+}
+.content .post .footer .head .participate{
+  overflow: hidden
+}
+.content .post .footer .head .participate::before{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 70%;
+  transform: skew(-45deg) translateX(-130%);
+  background: var(--Dark-color);
+  z-index: -1
+}
+.content .post .footer .head .participate span{
+  color: var(--Dark-color)
+}
+.content .post .footer .head .participate svg{
+  fill: var(--Dark-color)
+}
+.content .post .footer .head .participate:hover::before{
+  animation: participate 600ms ease-out forwards alternate;
+}
+@keyframes participate {
+  0%{
+    background: var(--Dark-color);
+    transform: skew(-45deg) translateX(-130%)
+  }
+  50%{
+    background: var(--Dark-color);
+    transform: skew(-45deg) translateX(30%)
+  }
+  100%{
+    background: var(--Primary-color);
+    transform: skew(-45deg) translateX(30%)
+  }
 }
 /* Comments */
 .content .posts .post .comments{
