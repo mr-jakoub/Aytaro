@@ -87,7 +87,6 @@ export const StateContext = ({ children }) =>{
     const addRise = async (courseId) => {
         try {
             await axios.put(`http://localhost:5000/api/courses/rise/${courseId}`)
-            
         } catch (err) {
             if(err.response){
                 setAlert(err.response.statusText,'danger')

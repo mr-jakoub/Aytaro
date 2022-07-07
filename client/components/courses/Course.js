@@ -11,7 +11,35 @@ import fetchers from '../../utils/fetchers'
 
 const Course = ({course, addComment, comments, profileCourses = false, deleteCourse, addLike}) => {
     const user = useSWR('/api/auth', fetchers.loadUser).data
-    const { addRise, getProfileById } = useStateContext()
+    const { addRise } = useStateContext()
+    /* Client side rise -- seems realtime -- */
+    let risedCourse = user && course.rises.filter(rise=> rise.user.toString() === user._id).length > 0
+    const [rises, setRises] = useState({
+        counter: course.rises.length,
+        rised: risedCourse
+    })
+    const { counter, rised } = rises
+    const handleRise = courseID => {
+        addRise(courseID)
+        setRises({counter: rised ? counter - 1 : counter + 1, rised: !rised})
+    }
+    const handleNumberOfRises = () =>{
+        if(counter === 1){
+            if(rised){
+                return "you"
+            }else{
+                return course.rises[0].name
+            }
+        }else if(counter > 1 && !rised){
+            return counter
+        }else if(counter === 2 && rised){
+            return "you and 1 other"
+        }else if(counter > 2 && rised){
+            return `you and ${counter - 1} others`
+        }else{
+            return ''
+        }
+    }
 
     const [dropDown, setDropDown] = useState({
         type: '',
@@ -29,8 +57,7 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
         text: ''
     })
     const { text } = formData
-    // Course rised or not
-    let risedCourse = user && course.rises.filter(rise=> rise.user.toString() === user._id).length > 0
+
     let commentsLength = comments.filter(cmnts => {
         if(cmnts.courseId === course._id){
             return cmnts
@@ -61,7 +88,7 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
         })*/
     }
     return !course ? <h1>Loading...</h1> :
-        <div className={risedCourse?"post blured-background rised":"post blured-background"}>
+        <div className="post blured-background">
             {/* behind course */}
             <div className="behind-post"></div>
             {course._id &&
@@ -212,10 +239,10 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
                     </div>
                     <p>{ course.description.length > 100 && readMore.type && course._id === readMore.courseId ? (<span onClick={()=>handleDropDown(course._id, 'readMore')}>{textCheck(course.description)}</span>) : (<span onClick={()=>handleDropDown(course._id, 'readMore')}>{textCheck(course.description.slice(0, 100))}</span>)}{course.description.length > 100 && ((!readMore.type) || (course._id !== readMore.courseId)) && (<span className="text-bold readMore" onClick={()=>handleDropDown(course._id, 'readMore')}> ...Read more</span>)}</p>
                 </div>}
-                <div className={course.rises.length > 0 || commentsLength > 0 ? "nmbrs" : "d-none" }>
+                <div className={counter > 0 || commentsLength > 0 ? "nmbrs" : "d-none" }>
                     <div>
-                        {course.rises.length > 0 &&
-                        <span style={course.rises.length > 0 ? {background: "var(--Primary-color)",border: "1px solid var(--White-color)"}:{background: "var(--Primary-color)"}} className='underline svg-icon next-icon'>
+                        {counter > 0 &&
+                        <span style={counter > 0 ? {background: "var(--Primary-color)",border: "1px solid var(--White-color)"}:{background: "var(--Primary-color)"}} className='underline svg-icon next-icon'>
                             <svg viewBox="0 0 512 512">
                                 <g>
                                     <path d="m256,128c-44.109,0-80,35.891-80,80v256c0,8.844 7.164,16 16,16s16-7.156 16-16v-256c0-26.469 21.531-48 48-48 26.469,0 48,21.531 48,48 0,8.836 7.164,16 16,16s16-7.164 16-16c0-44.109-35.891-80-80-80z"/>
@@ -231,9 +258,7 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
                                 </g>
                             </svg>
                         </span>}
-                        <span className='underline'>
-                            { course.rises.length === 1 ? course.rises[0].user === course.user ? "you" : course.rises[0].name : (course.rises.length > 1 && !risedCourse) ? course.rises.length : (course.rises.length > 1 && risedCourse )? `you and ${course.rises.length - 1} others` : '' }
-                        </span>
+                        <span className='underline'>{handleNumberOfRises()}</span>
                     </div>
                     <div>
                     {commentsLength > 0 &&
@@ -297,22 +322,22 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
                         </div>
                         }
                         {course.rises &&
-                        <div onClick={()=>addRise(course._id)} className="rise react svg-icon">
+                        <div onClick={()=>handleRise(course._id)} className="rise react svg-icon">
                             <svg viewBox="0 0 512 512">
                                 <g>
-                                    <path fill={risedCourse ?'var(--Primary-color)':''} d="m256,128c-44.109,0-80,35.891-80,80v256c0,8.844 7.164,16 16,16s16-7.156 16-16v-256c0-26.469 21.531-48 48-48 26.469,0 48,21.531 48,48 0,8.836 7.164,16 16,16s16-7.164 16-16c0-44.109-35.891-80-80-80z"/>
-                                    <path fill={risedCourse ?'var(--Primary-color)':''} d="m256,192c-8.836,0-16,7.164-16,16v144c0,8.836 7.164,16 16,16s16-7.164 16-16v-144c0-8.836-7.164-16-16-16z"/>
-                                    <path fill={risedCourse ?'var(--Primary-color)':''} d="m256,400c-8.836,0-16,7.164-16,16v80c0,8.844 7.164,16 16,16s16-7.156 16-16v-80c0-8.836-7.164-16-16-16z"/>
-                                    <path fill={risedCourse ?'var(--Primary-color)':''} d="m320,256c-8.836,0-16,7.164-16,16v192c0,8.844 7.164,16 16,16s16-7.156 16-16v-192c0-8.836-7.164-16-16-16z"/>
-                                    <path fill={risedCourse ?'var(--Primary-color)':''} d="m128,288c-8.836,0-16,7.164-16,16v112c0,8.844 7.164,16 16,16s16-7.156 16-16v-112c0-8.836-7.164-16-16-16z"/>
-                                    <path fill={risedCourse ?'var(--Primary-color)':''} d="m448,256c-8.836,0-16,7.164-16,16v80c0,8.836 7.164,16 16,16s16-7.164 16-16v-80c0-8.836-7.164-16-16-16z"/>
-                                    <path fill={risedCourse ?'var(--Primary-color)':''} d="m368.711,145.203c-8.195,3.32-12.148,12.641-8.836,20.836 5.391,13.32 8.125,27.438 8.125,41.961v208c0,8.844 7.164,16 16,16s16-7.156 16-16v-208c0-18.656-3.516-36.813-10.453-53.961-3.313-8.187-12.594-12.141-20.836-8.836z"/>
-                                    <path fill={risedCourse ?'var(--Primary-color)':''} d="M256,64c-79.398,0-144,64.602-144,144v32c0,8.836,7.164,16,16,16s16-7.164,16-16v-32c0-61.758,50.242-112,112-112   c25.789,0,50.008,8.508,70.055,24.617c6.914,5.523,16.961,4.438,22.5-2.453c5.531-6.891,4.43-16.961-2.453-22.5   C320.68,75.242,288.68,64,256,64z"/>
-                                    <path fill={risedCourse ?'var(--Primary-color)':''} d="m185.547,46.664c22.258-9.734 45.961-14.664 70.453-14.664 97.047,0 176,78.953 176,176 0,8.836 7.164,16 16,16s16-7.164 16-16c0-114.695-93.305-208-208-208-28.93,0-56.945,5.836-83.266,17.336-8.102,3.539-11.797,12.977-8.258,21.07 3.555,8.102 12.993,11.758 21.071,8.258z"/>
-                                    <path fill={risedCourse ?'var(--Primary-color)':''} d="m123.563,68.078c-6.594-5.906-16.695-5.328-22.594,1.25-34.156,38.164-52.969,87.406-52.969,138.672v144c0,8.836 7.164,16 16,16s16-7.164 16-16v-144c0-43.375 15.914-85.047 44.813-117.328 5.89-6.586 5.335-16.703-1.25-22.594z"/>
+                                    <path fill={rised ?'var(--Primary-color)':''} d="m256,128c-44.109,0-80,35.891-80,80v256c0,8.844 7.164,16 16,16s16-7.156 16-16v-256c0-26.469 21.531-48 48-48 26.469,0 48,21.531 48,48 0,8.836 7.164,16 16,16s16-7.164 16-16c0-44.109-35.891-80-80-80z"/>
+                                    <path fill={rised ?'var(--Primary-color)':''} d="m256,192c-8.836,0-16,7.164-16,16v144c0,8.836 7.164,16 16,16s16-7.164 16-16v-144c0-8.836-7.164-16-16-16z"/>
+                                    <path fill={rised ?'var(--Primary-color)':''} d="m256,400c-8.836,0-16,7.164-16,16v80c0,8.844 7.164,16 16,16s16-7.156 16-16v-80c0-8.836-7.164-16-16-16z"/>
+                                    <path fill={rised ?'var(--Primary-color)':''} d="m320,256c-8.836,0-16,7.164-16,16v192c0,8.844 7.164,16 16,16s16-7.156 16-16v-192c0-8.836-7.164-16-16-16z"/>
+                                    <path fill={rised ?'var(--Primary-color)':''} d="m128,288c-8.836,0-16,7.164-16,16v112c0,8.844 7.164,16 16,16s16-7.156 16-16v-112c0-8.836-7.164-16-16-16z"/>
+                                    <path fill={rised ?'var(--Primary-color)':''} d="m448,256c-8.836,0-16,7.164-16,16v80c0,8.836 7.164,16 16,16s16-7.164 16-16v-80c0-8.836-7.164-16-16-16z"/>
+                                    <path fill={rised ?'var(--Primary-color)':''} d="m368.711,145.203c-8.195,3.32-12.148,12.641-8.836,20.836 5.391,13.32 8.125,27.438 8.125,41.961v208c0,8.844 7.164,16 16,16s16-7.156 16-16v-208c0-18.656-3.516-36.813-10.453-53.961-3.313-8.187-12.594-12.141-20.836-8.836z"/>
+                                    <path fill={rised ?'var(--Primary-color)':''} d="M256,64c-79.398,0-144,64.602-144,144v32c0,8.836,7.164,16,16,16s16-7.164,16-16v-32c0-61.758,50.242-112,112-112   c25.789,0,50.008,8.508,70.055,24.617c6.914,5.523,16.961,4.438,22.5-2.453c5.531-6.891,4.43-16.961-2.453-22.5   C320.68,75.242,288.68,64,256,64z"/>
+                                    <path fill={rised ?'var(--Primary-color)':''} d="m185.547,46.664c22.258-9.734 45.961-14.664 70.453-14.664 97.047,0 176,78.953 176,176 0,8.836 7.164,16 16,16s16-7.164 16-16c0-114.695-93.305-208-208-208-28.93,0-56.945,5.836-83.266,17.336-8.102,3.539-11.797,12.977-8.258,21.07 3.555,8.102 12.993,11.758 21.071,8.258z"/>
+                                    <path fill={rised ?'var(--Primary-color)':''} d="m123.563,68.078c-6.594-5.906-16.695-5.328-22.594,1.25-34.156,38.164-52.969,87.406-52.969,138.672v144c0,8.836 7.164,16 16,16s16-7.164 16-16v-144c0-43.375 15.914-85.047 44.813-117.328 5.89-6.586 5.335-16.703-1.25-22.594z"/>
                                 </g>
                             </svg>
-                            <span style={risedCourse ?{color:'var(--Primary-color)'}:{color:'var(--Grey-color)'}} className='sm-foricon'>Rise</span>
+                            <span style={rised ?{color:'var(--Primary-color)'}:{color:'var(--Grey-color)'}} className='sm-foricon'>Rise</span>
                         </div>}
                         <div onClick={()=>handleDropDown(course._id, 'commentSection')} className="comment react svg-icon">
                             <svg  viewBox="0 0 60 60">
