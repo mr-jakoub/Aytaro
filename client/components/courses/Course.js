@@ -87,6 +87,7 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
             text: ''
         })*/
     }
+    console.log(course.requirements)
     return !course ? <h1>Loading...</h1> :
         <div className="post blured-background">
             {/* behind course */}
@@ -231,14 +232,21 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
                         </div>
                     </div>
                 </div>
-                {course.description && 
                 <div className="body">
-                    <p className="title">{course.title}</p>
+                    <p className="title">{course.funds[0].price}<span>{course.funds[0].currency}</span></p>
                     <div className='thumbnail'>
                         <img src={course.thumbnail} alt="thumbnail" />
                     </div>
-                    <p>{ course.description.length > 100 && readMore.type && course._id === readMore.courseId ? (<span onClick={()=>handleDropDown(course._id, 'readMore')}>{textCheck(course.description)}</span>) : (<span onClick={()=>handleDropDown(course._id, 'readMore')}>{textCheck(course.description.slice(0, 100))}</span>)}{course.description.length > 100 && ((!readMore.type) || (course._id !== readMore.courseId)) && (<span className="text-bold readMore" onClick={()=>handleDropDown(course._id, 'readMore')}> ...Read more</span>)}</p>
-                </div>}
+                    {course.requirements[0] !== "No requirements" && <p className="title">Requirements</p>}
+                    <ul className="requirements">
+                        {course.requirements.map((requirement, key)=><li style={{listStyle: "circle"}} key={key}>{requirement}</li>)}
+                    </ul>
+                    <div className="line"></div>
+                    <p>{ course.description.length > 90 && readMore.type && course._id === readMore.courseId ? (<span onClick={()=>handleDropDown(course._id, 'readMore')}>{textCheck(course.description)}</span>) : (<span onClick={()=>handleDropDown(course._id, 'readMore')}>{textCheck(course.description.slice(0, 90))}</span>)}{course.description.length > 90 && ((!readMore.type) || (course._id !== readMore.courseId)) && (<span className="text-bold readMore" onClick={()=>handleDropDown(course._id, 'readMore')}> ...Read more</span>)}</p>
+                    <ul className="categories">
+                        {course.categories.map((category, key)=><li key={key}><Link href={`/courses?category=${category}`}><a>#{category}</a></Link></li>)}
+                    </ul>
+                </div>
                 <div className={counter > 0 || commentsLength > 0 ? "nmbrs" : "d-none" }>
                     <div>
                         {counter > 0 &&

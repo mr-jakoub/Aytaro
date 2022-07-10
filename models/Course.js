@@ -26,18 +26,18 @@ const CourseSchema = new Schema({
         type: [String],
         default: ['No requirements']
     },
-    price:{
-        type: Number,
-        currency: {
-            type: String,
-            default: 'DZD'
-        },
-        required: true
-    },
-    price:{
-        type: Number,
-        required: true
-    },
+    funds:[
+        {
+            price:{
+                type: Number,
+                required: true
+            },
+            currency: {
+                type: String,
+                default: 'DZD'
+            }
+        }
+    ],
     coupon:{
         type: String
     },

@@ -6,12 +6,58 @@ import Courses from '../courses/Courses'
 import fetchers from '../../utils/fetchers'
 
 const Dashboard = () =>{
-    const { logout, setStateUser } = useStateContext()
+    const { logout } = useStateContext()
     const [leftAside, setLeftAside] = useState(false)
     const [rightAside, setRightAside] = useState(false)
     const [languesDown, setLanguesDown] = useState(false)
     const courses = useSWR('/api/courses', fetchers.getCourses).data
-    return courses === undefined ? <h1>Loading...</h1> :
+
+    const [loggedIn, setLoggedIn] = useState(null)
+    const handleLoggedIn = () =>{
+        setLoggedIn(false)
+        if (process.browser) sessionStorage.removeItem("loggedIn")
+    }
+    useEffect(()=>{
+        if(sessionStorage.getItem("loggedIn") === "start"){
+            setLoggedIn(true)
+        }else{
+            setLoggedIn(false)
+        }
+    },[])
+    return loggedIn === true ? 
+    <div className="loggedIn">
+        <svg id="paths" viewBox="0.9 -11.1 28.2 28.2">
+            <path d="M 1 3 L 5 5 L 7 3 L 15 3" />
+            <path d="M 1 11 L 7 9 L 9 6 L 15 3" />
+            <path d="M 1 14 L 12 10 L 15 3" />
+            <path d="M 12 17 L 12 12 L 14 10 L 15 3 L 15 3" />
+            <path d="M 18 17 L 18 12 L 16 10 L 15 3" />
+            <path d="M 29 14 L 18 10 L 15 3" />
+            <path d="M 29 11 L 23 9 L 21 6 L 15 3" />
+            <path d="M 29 3 L 25 1 L 23 3 L 15 3" />
+            <path d="M 1 -5 L 7 -3 L 9 0 L 15 3" />
+            <path d="M 1 -8 L 12 -4 L 15 3" />
+            <path d="M 12 -11 L 12 -6 L 14 -4 L 15 3" />
+            <path d="M 18 -11 L 18 -6 L 16 -4 L 15 3" />
+            <path d="M 29 -8 L 18 -4 L 15 3" />
+            <path d="M 29 -5 L 23 -3 L 21 0 L 15 3" />
+        </svg>
+        <svg onAnimationEnd={handleLoggedIn} id="basma" viewBox="0 0 512 512">
+            <g>
+                <path d="m256,128c-44.109,0-80,35.891-80,80v256c0,8.844 7.164,16 16,16s16-7.156 16-16v-256c0-26.469 21.531-48 48-48 26.469,0 48,21.531 48,48 0,8.836 7.164,16 16,16s16-7.164 16-16c0-44.109-35.891-80-80-80z"/>
+                <path d="m256,192c-8.836,0-16,7.164-16,16v144c0,8.836 7.164,16 16,16s16-7.164 16-16v-144c0-8.836-7.164-16-16-16z"/>
+                <path d="m256,400c-8.836,0-16,7.164-16,16v80c0,8.844 7.164,16 16,16s16-7.156 16-16v-80c0-8.836-7.164-16-16-16z"/>
+                <path d="m320,256c-8.836,0-16,7.164-16,16v192c0,8.844 7.164,16 16,16s16-7.156 16-16v-192c0-8.836-7.164-16-16-16z"/>
+                <path d="m128,288c-8.836,0-16,7.164-16,16v112c0,8.844 7.164,16 16,16s16-7.156 16-16v-112c0-8.836-7.164-16-16-16z"/>
+                <path d="m448,256c-8.836,0-16,7.164-16,16v80c0,8.836 7.164,16 16,16s16-7.164 16-16v-80c0-8.836-7.164-16-16-16z"/>
+                <path d="m368.711,145.203c-8.195,3.32-12.148,12.641-8.836,20.836 5.391,13.32 8.125,27.438 8.125,41.961v208c0,8.844 7.164,16 16,16s16-7.156 16-16v-208c0-18.656-3.516-36.813-10.453-53.961-3.313-8.187-12.594-12.141-20.836-8.836z"/>
+                <path d="M256,64c-79.398,0-144,64.602-144,144v32c0,8.836,7.164,16,16,16s16-7.164,16-16v-32c0-61.758,50.242-112,112-112   c25.789,0,50.008,8.508,70.055,24.617c6.914,5.523,16.961,4.438,22.5-2.453c5.531-6.891,4.43-16.961-2.453-22.5   C320.68,75.242,288.68,64,256,64z"/>
+                <path d="m185.547,46.664c22.258-9.734 45.961-14.664 70.453-14.664 97.047,0 176,78.953 176,176 0,8.836 7.164,16 16,16s16-7.164 16-16c0-114.695-93.305-208-208-208-28.93,0-56.945,5.836-83.266,17.336-8.102,3.539-11.797,12.977-8.258,21.07 3.555,8.102 12.993,11.758 21.071,8.258z"/>
+                <path d="m123.563,68.078c-6.594-5.906-16.695-5.328-22.594,1.25-34.156,38.164-52.969,87.406-52.969,138.672v144c0,8.836 7.164,16 16,16s16-7.164 16-16v-144c0-43.375 15.914-85.047 44.813-117.328 5.89-6.586 5.335-16.703-1.25-22.594z"/>
+            </g>
+        </svg>
+    </div>
+    : courses === undefined || loggedIn === null ? <h1>Loading...</h1> :
         <>
         {/* <PopUp popupForm={popupForm} match={match} /> */}
             <aside className={leftAside ?"blured-background show":"blured-background"}>

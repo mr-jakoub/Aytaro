@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import useSWR from "swr"
 import { getCookie } from 'cookies-next'
@@ -26,7 +26,11 @@ const Login = () =>{
     if(error){
         return 'Error'
     }
-    if(getCookie('token')) router.push('/')
+    if(getCookie('token')){
+        if (process.browser) sessionStorage.setItem("loggedIn", "start")
+        router.push('/')
+    }
+    
     return data === undefined || getCookie('token') ? <h1>Loading...</h1> :
         <>
         <div className="alerts">
