@@ -188,7 +188,6 @@ a:not(.logo):hover{
   width: 100%;
   height: 100%;
   background: var(--White-color);
-  pointer-events: none;
   user-select: none;
   z-index: 9999999
 }
@@ -201,7 +200,7 @@ a:not(.logo):hover{
   stroke-dasharray: 1010;
   stroke-dashoffset: 1010;
   z-index: 3;
-  animation: loggedInbasma 5s 2.5s cubic-bezier(.40, 0, .9, .30) forwards
+  animation: loggedInbasma 5s 2.3s cubic-bezier(.40, 0, .9, .30) forwards
 }
 @keyframes loggedInbasma {
   0%{
@@ -213,13 +212,13 @@ a:not(.logo):hover{
   }
   80%{
     stroke-dashoffset: 0;
-    filter: drop-shadow(0 0 15px var(--Primary-color));
+    filter: drop-shadow(0 0 10px var(--Primary-color));
   }
   100%{
     stroke-dashoffset: 0;
   }
 }
-.loggedIn::before{
+/*.loggedIn::before{
   content: '';
   position: absolute;
   top: 50%;
@@ -230,22 +229,22 @@ a:not(.logo):hover{
   box-shadow: inset 0 0 30px rgba(0,0,0,.13),
               inset 0 0 10px 10px rgba(27, 136, 167, .4),
               inset 0 0 10px rgba(27, 136, 167, .8);
-  background: transparent;
+  background: rgba(27, 136, 167, .5);
   border-radius: 100px;
   z-index: 2;
-  animation: loggedInbefore 1s 2.2s ease forwards;
-}
+  animation: loggedInbefore 1s 3s ease forwards;
+}*/
 @keyframes loggedInbefore{
   from{
-    transform: translate(-50%,-50%) scale(0);
+    transform: scale(0);
   }
   to{
-    transform: translate(-50%,-50%) scale(1);
+    transform: scale(1);
   }
 }
 .loggedIn #paths{
   position: absolute;
-  transform: scaleX(2.5);
+  transform: scale(2.5,1.05);
   width: 100%;
   height: 100%;
   fill: none;
@@ -253,16 +252,61 @@ a:not(.logo):hover{
   stroke-dashoffset: 515;
   stroke: var(--Dark-color);
   z-index: 1;
-  stroke-width: .06;
+  stroke-width: .06
+}
+@media (min-width: 1550px) {
+  .loggedIn #paths{
+    position: absolute;
+    transform: scale(3,1.1)
+  }
+  .loggedIn #basma{
+    transform: scale(1.1);
+  }
+}
+@media (max-width: 630px) {
+  .loggedIn #paths{
+    position: absolute;
+    transform: scale(2.2,1.3)
+  }
+  .loggedIn #basma{
+    transform: scale(.9);
+  }
+}
+@media (max-width: 500px) {
+  .loggedIn #paths{
+    position: absolute;
+    transform: scale(3,1.7)
+  }
+  .loggedIn #basma{
+    transform: scale(.8);
+  }
+}
+@media (max-width: 400px) {
+  .loggedIn #paths{
+    position: absolute;
+    transform: scale(4,2.2)
+  }
+  .loggedIn #basma{
+    transform: scale(.8);
+  }
+}
+@media (max-width: 300px) {
+  .loggedIn #paths{
+    position: absolute;
+    transform: scale(4,3.4)
+  }
+  .loggedIn #basma{
+    transform: scale(.7);
+  }
 }
 .loggedIn #paths path{
   animation: loggedInpaths 4s cubic-bezier(.40, 0, .9, .30) forwards;
 }
-.loggedIn #paths path:nth-child(2n){
-  animation-delay: 1.2s
+.loggedIn #paths path.path-delay:nth-child(2n + 1){
+  animation-delay: 2s
 }
-.loggedIn #paths path:nth-child(2n + 1){
-  animation-delay: 500ms;
+.loggedIn #paths path.path-delay:nth-child(2n){
+  animation-delay: 3s
 }
 @keyframes loggedInpaths {
   0%{
@@ -272,6 +316,12 @@ a:not(.logo):hover{
     stroke: var(--Primary-color);
     stroke-dashoffset: 450;
   }
+}
+.loggedIn #paths #hexagone{
+  fill: var(--White-color);
+  stroke: var(--Primary-color);
+  transform-origin: center;
+  animation: loggedInpaths 4s 2.2s cubic-bezier(.40, 0, .9, .30) forwards;
 }
 
 /* Shapes */
@@ -2092,10 +2142,13 @@ aside ul li .languages a{
 }
 .content .posts .post .body{
   position: relative;
-  padding: .3rem 0;
   z-index: 3
 }
-.content .posts .post .body img{
+.content .posts .post .body .thumbnail{
+  margin: 0;
+  padding: 0;
+}
+.content .posts .post .body .thumbnail img{
   max-height: 300px;
   width: 100%;
 }
@@ -2133,6 +2186,44 @@ aside ul li .languages a{
   text-align: start;
   user-select: text
 }
+.content .posts .post .body .info{
+  position: relative;
+  overflow: hidden;
+  max-height: 0;
+  transition: 0.15s ease-out;
+}
+.content .posts .post .body .info.active{
+  max-height: none
+}
+.content .posts .post .body .more{
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  font-size: .98rem;
+  letter-spacing: .05em;
+  padding: .2rem 1rem;
+  cursor: pointer;
+}
+.content .posts .post .body .more .toggler{
+  vertical-align: middle;
+  margin-bottom: 5px;
+  margin-left: .3rem;
+  background: var(--Smooth-Back);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: .3rem;
+  width: 25px;
+  height: 25px;
+}
+.content .posts .post .body .more .toggler svg{
+  width: 25px;
+  height: 25px;
+}
+.content .posts .post .body .more.active .toggler svg{
+  transform: rotate(180deg);
+}
 .content .posts .post .body .categories{
   display: flex;
   justify-content: flex-start;
@@ -2148,9 +2239,9 @@ aside ul li .languages a{
 }
 .content .posts .post .body .categories li a{
   color: var(--White-color);
-  font-size: .7em;
+  font-size: .8rem;
   letter-spacing: 1.2px;
-  font-weight: bolder;
+  font-weight: 600;
 }
 .content .posts .post .body .requirements{
   padding: 0 1rem;

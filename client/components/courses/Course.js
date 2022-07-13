@@ -57,6 +57,7 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
         text: ''
     })
     const { text } = formData
+    const [viewMore, setViewMore] = useState(false)
 
     let commentsLength = comments.filter(cmnts => {
         if(cmnts.courseId === course._id){
@@ -87,7 +88,6 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
             text: ''
         })*/
     }
-    console.log(course.requirements)
     return !course ? <h1>Loading...</h1> :
         <div className="post blured-background">
             {/* behind course */}
@@ -237,15 +237,27 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
                     <div className='thumbnail'>
                         <img src={course.thumbnail} alt="thumbnail" />
                     </div>
-                    {course.requirements[0] !== "No requirements" && <p className="title">Requirements</p>}
-                    <ul className="requirements">
-                        {course.requirements.map((requirement, key)=><li style={{listStyle: "circle"}} key={key}>{requirement}</li>)}
-                    </ul>
-                    <div className="line"></div>
-                    <p>{ course.description.length > 90 && readMore.type && course._id === readMore.courseId ? (<span onClick={()=>handleDropDown(course._id, 'readMore')}>{textCheck(course.description)}</span>) : (<span onClick={()=>handleDropDown(course._id, 'readMore')}>{textCheck(course.description.slice(0, 90))}</span>)}{course.description.length > 90 && ((!readMore.type) || (course._id !== readMore.courseId)) && (<span className="text-bold readMore" onClick={()=>handleDropDown(course._id, 'readMore')}> ...Read more</span>)}</p>
-                    <ul className="categories">
-                        {course.categories.map((category, key)=><li key={key}><Link href={`/courses?category=${category}`}><a>#{category}</a></Link></li>)}
-                    </ul>
+                    <div onClick={()=>setViewMore(!viewMore)} className={viewMore ? "more active" : "more"}>
+                        <span>View {viewMore ? "less" : "more"} details</span>
+                        <span className="svg-icon toggler">
+                            <svg viewBox="0 0 330 330">
+                                <path id="XMLID_225_" d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393
+                                    c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393
+                                    s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div className={viewMore ? "info active" : "info"}>    
+                        {course.requirements[0] !== "No requirements" && <p className="title">Requirements</p>}
+                        <ul className="requirements">
+                            {course.requirements.map((requirement, key)=><li style={{listStyle: "circle"}} key={key}>{requirement}</li>)}
+                        </ul>
+                        <div className="line"></div>
+                        <p>{ course.description.length > 90 && readMore.type && course._id === readMore.courseId ? (<span onClick={()=>handleDropDown(course._id, 'readMore')}>{textCheck(course.description)}</span>) : (<span onClick={()=>handleDropDown(course._id, 'readMore')}>{textCheck(course.description.slice(0, 90))}</span>)}{course.description.length > 90 && ((!readMore.type) || (course._id !== readMore.courseId)) && (<span className="text-bold readMore" onClick={()=>handleDropDown(course._id, 'readMore')}> ...Read more</span>)}</p>
+                        <ul className="categories">
+                            {course.categories.map((category, key)=><li key={key}><Link href={`/courses?category=${category}`}><a>#{category}</a></Link></li>)}
+                        </ul>
+                    </div>
                 </div>
                 <div className={counter > 0 || commentsLength > 0 ? "nmbrs" : "d-none" }>
                     <div>

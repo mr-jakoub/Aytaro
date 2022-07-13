@@ -27,20 +27,27 @@ const Dashboard = () =>{
     return loggedIn === true ? 
     <div className="loggedIn">
         <svg id="paths" viewBox="0.9 -11.1 28.2 28.2">
-            <path d="M 1 3 L 5 5 L 7 3 L 15 3" />
-            <path d="M 1 11 L 7 9 L 9 6 L 15 3" />
-            <path d="M 1 14 L 12 10 L 15 3" />
-            <path d="M 12 17 L 12 12 L 14 10 L 15 3 L 15 3" />
-            <path d="M 18 17 L 18 12 L 16 10 L 15 3" />
-            <path d="M 29 14 L 18 10 L 15 3" />
-            <path d="M 29 11 L 23 9 L 21 6 L 15 3" />
-            <path d="M 29 3 L 25 1 L 23 3 L 15 3" />
-            <path d="M 1 -5 L 7 -3 L 9 0 L 15 3" />
-            <path d="M 1 -8 L 12 -4 L 15 3" />
-            <path d="M 12 -11 L 12 -6 L 14 -4 L 15 3" />
-            <path d="M 18 -11 L 18 -6 L 16 -4 L 15 3" />
-            <path d="M 29 -8 L 18 -4 L 15 3" />
-            <path d="M 29 -5 L 23 -3 L 21 0 L 15 3" />
+            <path className="path-delay" d="M 1 3 L 5 5 L 7 3 L 13.6 3" />
+            <path className="path-delay" d="M 1 11 L 7 9 L 9 6 L 13.735483646392 3.6" />
+            <path className="path-delay" d="M 1 14 L 11 9 L 13.9387096 4.5" />
+            <path className="path-delay" d="M 12 17 L 13 13 L 14 10 L 14.6 6.1" />
+            <path className="path-delay" d="M 18 17 L 17 13 L 16 10 L 15.4 6.1" />
+            <path className="path-delay" d="M 29 14 L 19 9 L 15.9032254 5.2" />
+            <path className="path-delay" d="M 29 11 L 23 9 L 21 6 L 16.2758 3.550021" />
+            <path className="path-delay" d="M 29 3 L 25 1 L 23 3 L 16.4 3" />
+            <path className="path-delay" d="M 1 -5 L 7 -3 L 9 0 L 13.758 2.3" />
+            <path className="path-delay" d="M 1 -8 L 11 -3 L 14 1.22858" />
+            <path className="path-delay" d="M 12 -11 L 13 -7 L 14 -4 L 14.6 -0.1" />
+            <path className="path-delay" d="M 18 -11 L 17 -7 L 16 -4 L 15.4 -0.1" />
+            <path className="path-delay" d="M 29 -8 L 19 -3 L 16 1.22857" />
+            <path className="path-delay" d="M 29 -5 L 23 -3 L 21 0 L 16.196774 2.1" />
+            <path style={{animationDelay: "1.65s"}} d="M 23.5 17 L 19 12 L 17 10 L 15.7 6.1" />
+            <path style={{animationDelay: "650ms"}} d="M 23.5 -11 L 19.1 -6.1 L 17 -4 L 15.7 -0.1" />
+            <path d="M 6.5 -11 L 11 -6 L 13 -4 L 14.3 -0.1" />
+            <path style={{animationDelay: "1.8s"}} d="M 6.5 17 L 11 12 L 13 10 L 14.3 6.1" />
+            <g>
+                <path id="hexagone" d="M 14.3 -0.1 L 15.7 -0.1 L 16.4 3 L 15.7 6.1 L 14.3 6.1 L 13.6 3 L 14.3 -0.1" />
+            </g>
         </svg>
         <svg onAnimationEnd={handleLoggedIn} id="basma" viewBox="0 0 512 512">
             <g>
