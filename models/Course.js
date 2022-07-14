@@ -26,6 +26,10 @@ const CourseSchema = new Schema({
         type: [String],
         default: ['No requirements']
     },
+    willLearn:{
+        type: [String],
+        required: true
+    },
     funds:[
         {
             price:{
@@ -38,8 +42,8 @@ const CourseSchema = new Schema({
             }
         }
     ],
-    coupon:{
-        type: String
+    coupons:{
+        type: [String]
     },
     avatar:{
         type: String

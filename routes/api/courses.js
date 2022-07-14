@@ -25,9 +25,9 @@ router.post('/', [ auth, [
     }
     try {
         const user = await User.findById(req.user.id).select('-password')
-        const { title, description, categories, languages, requirements, funds, coupon, sections, thumbnail } = req.body
+        const { title, description, categories, languages, requirements, willLearn, funds, coupons, sections, thumbnail } = req.body
         // Fill Course fields
-        const courseFields = { user: user.id, avatar: user.avatar, name: user.name, title, description, coupon }
+        const courseFields = { user: user.id, avatar: user.avatar, name: user.name, title, description, coupons }
         for(const [key, value] of Object.entries(courseFields)) {
             if (value && value.length > 0) {
                 courseFields[key] = value
@@ -40,6 +40,7 @@ router.post('/', [ auth, [
         if(categories) courseFields.categories = categories.split(',').map(category=>category.trim())
         if(languages) courseFields.languages = languages.split(',').map(language=>language.trim())
         if(requirements) courseFields.requirements = requirements.split(',').map(requirement=>requirement)
+        if(willLearn) courseFields.willLearn = willLearn.split(',').map(willLearnItem=>willLearnItem)
         // Build sections [{...},{...}]
         courseFields.sections = sections
         const newCourse = new Course(courseFields)
