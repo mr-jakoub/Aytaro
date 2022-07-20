@@ -1,0 +1,58 @@
+[
+    {
+        "text":" Happy",
+        "emoji":"😀"
+    },
+    {
+        "text":" Sad",
+        "emoji":"😢"
+    },
+    {
+        "text":" Very Well",
+        "emoji":"🥰"
+    },
+    {
+        "text":" Tired",
+        "emoji":"😴"
+    },
+    {
+        "text":" Fortunate",
+        "emoji":"😇"
+    },
+    {
+        "text":" Crazy",
+        "emoji":"🤪"
+    },
+    {
+        "text":" Motivated",
+        "emoji":"😎"
+    },
+    {
+        "text":" Confused",
+        "emoji":"😯"
+    },
+    {
+        "text":" Funny",
+        "emoji":"🤣"
+    },
+    {
+        "text":" Not Funny",
+        "emoji":"😒"
+    },
+    {
+        "text":" Power",
+        "emoji":"💪"
+    },
+    {
+        "text":" Sick",
+        "emoji":"🤒"
+    },
+    {
+        "text":" Doubt",
+        "emoji":"🤨"
+    },
+    {
+        "text":" Emmm",
+        "emoji":"🙄"
+    }
+]

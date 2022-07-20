@@ -470,6 +470,7 @@ font-weight: 300
   outline: none;
   border: none;
   background: var(--Light-color);
+  color: var(--Dark-color);
   display: block;
   width: 100%;
   max-width: 100%;
@@ -745,7 +746,7 @@ textarea.input-item{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: .4rem 2rem;
+  padding: .4rem 1.5rem;
   background: transparent;
   border-radius: var(--Primary-radius);
   overflow: hidden;
@@ -1643,16 +1644,17 @@ aside ul li .languages a{
   left: 0;
   width: 100%;
   background: var(--White-color);
-  transform: translateX(100%);
+  transform: translateX(120%);
   height: 100%;
   transition: 250ms cubic-bezier(0,.1,1,1.14);
-  padding: .5rem 0;
+  padding: .7rem 0;
   z-index: 9
 }
 .postForm .box .overpop .header .back{
   position: absolute;
   top: 0;
   left: 0;
+  transform: translateX(5px);
   cursor: pointer;
 }
 .postForm .box .overpop .search-container{
@@ -1686,77 +1688,46 @@ aside ul li .languages a{
   letter-spacing: 1.2px
 }
 /* Start backPage */
-.postForm .backPage.active{ transform: translateX(0%); }
+.postForm .overpop.active{ transform: translateX(0%); }
 /* End backPage */
-/* Start emojis */
-.postForm .emojis.active{ transform: translateX(0%); }
-.postForm .emojis .emojis-box{
-  position: relative;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  max-height: 100%;
-  padding-top: .5rem;
-  padding-bottom: 5.7rem;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-}
-.postForm .emojis .emojis-box li{
-  padding: .3rem;
-  width: 50%;
-}
-.postForm .emojis .emojis-box li .emoji{
-  display: flex;
-  align-items: center;
-  border-radius: 8px;
-  padding: .6rem;
-  cursor: pointer;
-  user-select: none;
-  letter-spacing: 1.2px;
-  transform: scale(1);
-  font-size: .89rem;
-}
-.postForm .emojis .emojis-box li .emoji:hover{
-  background: var(--White-color-secondary)
-}
-.postForm .emojis .emojis-box li .emoji:active{
-  transform: scale(.989)
-}
-.postForm .emojis .emojis-box li .emoji-icon{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: .5rem;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  font-size: 1.1rem;
-  background: var(--White-color-secondary)
-}
-.postForm .emojis .emojis-box li.choosen .emoji,
-.postForm .emojis .emojis-box li.choosen .emoji-icon{
-  background: var(--Black-color)
-}
-/* End emojis */
-/* Start locationPage */
-.postForm .locationPage.active{ transform: translateX(0%); }
-/* End locationPage */
 .postForm .box .header{
   position: relative;
   text-align: center;
-  padding: .3rem 0;
+  padding: .3rem 0
 }
 .postForm .box .header .close{
   position: absolute;
   top: 0;
   right: 0;
-  cursor: pointer;
+  cursor: pointer
 }
 .postForm .box .body{
   position: relative;
   width: 100%;
-  padding: 0 .8rem;
+  padding: 0 .8rem
 }
+.postForm .box .body .forms{
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  transform: translateX(var(--formSlideWidth)) scale(1)
+}
+.postForm .box .body .forms.next{
+  animation: formSlideWidth 1s cubic-bezier(.6, 0, 0, .2) forwards
+}
+@keyframes formSlideWidth{
+  0%{
+    transform: translateX(var(--oldFormSlideWidth));
+  }
+  50%{
+    transform: translateX(calc(var(--oldFormSlideWidth) + 5%));
+  }
+  100%{
+    transform: translateX(var(--formSlideWidth));
+  }
+}
+.postForm .box .body .overpop.active{ transform: translateX(0%); }
 .postForm .box .body textarea{
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   max-width: 100%;
@@ -1764,8 +1735,11 @@ aside ul li .languages a{
   display: flex;
   align-items: center;
   font-size: 1rem;
-  padding: .5rem .3rem;
+  padding: .7rem .5rem;
   color: var(--Dark-color);
+  box-shadow: inset 0 0 1.5px var(--shadow-sm);
+  border-radius: var(--Radius-xs);
+  margin: .5rem 0;
   line-height: 15px;
   resize: none;
   min-height: 90px;
@@ -1774,12 +1748,15 @@ aside ul li .languages a{
   border: none;
   outline: none
 }
+.postForm .box .body textarea.title{
+  min-height: 45px;
+}
 .postForm .box .body .moreinfo{
   position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: var(--box-shadow2);
+  box-shadow: inset 0 0 1.5px var(--shadow-sm);
   border-radius: var(--Radius-xs);
   margin: .5rem 0;
   padding: .5rem

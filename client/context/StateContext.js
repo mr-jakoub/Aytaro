@@ -9,11 +9,9 @@ const Context = createContext()
 export const StateContext = ({ children }) =>{
     // Global state
     const [state, setState] = useState({
-        user: null
+        user: null,
+        popupForm: "none"
     })
-    const setStateUser = user =>{
-        setState({...state, user})
-    }
     // Alerts
     const [alerts, setAlerts] = useState([])
     const setAlert = (alertMessage, alertType, timeout = 3000) =>{
@@ -59,7 +57,6 @@ export const StateContext = ({ children }) =>{
             setCookie("token",res.data.token)
             fetchers.loadUser()
             setState({...state, user: res.data})
-            setAlert('Welcome back.','success')
         } catch (err) {
             if(err.response){
                 const errors = err.response.data.errors
@@ -97,7 +94,7 @@ export const StateContext = ({ children }) =>{
     return(
         <Context.Provider value={{
             state,
-            setStateUser,
+            setState,
 
             alerts,
             setAlert,

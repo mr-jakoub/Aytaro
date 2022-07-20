@@ -4,13 +4,15 @@ import { useStateContext } from '../../context/StateContext'
 import useSWR from 'swr'
 import Courses from '../courses/Courses'
 import fetchers from '../../utils/fetchers'
+import Popup from "./Popup"
 
-const Dashboard = () =>{
-    const { logout } = useStateContext()
+const Dashboard = ({ user }) =>{
+    const { logout, state, setState } = useStateContext()
     const [leftAside, setLeftAside] = useState(false)
     const [rightAside, setRightAside] = useState(false)
     const [languesDown, setLanguesDown] = useState(false)
     const courses = useSWR('/api/courses', fetchers.getCourses).data
+    const [popupForm, setPopupForm] = useState("none")
 
     const [loggedIn, setLoggedIn] = useState(null)
     const handleLoggedIn = () =>{
@@ -24,7 +26,12 @@ const Dashboard = () =>{
             setLoggedIn(false)
         }
     },[])
-    return loggedIn === true ? 
+    useEffect(()=>{
+        setState({...state, user})
+        console.log(state)
+    },[])
+
+    return loggedIn === true ?
     <div className="loggedIn">
         <svg id="paths" viewBox="0.9 -11.1 28.2 28.2">
             <path className="path-delay" d="M 1 3 L 5 5 L 7 3 L 13.6 3" />
@@ -66,7 +73,7 @@ const Dashboard = () =>{
     </div>
     : courses === undefined || loggedIn === null ? <h1>Loading...</h1> :
         <>
-        {/* <PopUp popupForm={popupForm} match={match} /> */}
+        <Popup popupForm={popupForm} handlePopupForm={setPopupForm} />
             <aside className={leftAside ?"blured-background show":"blured-background"}>
                 <span onClick={()=>{setLeftAside(!leftAside);setRightAside(false)}} className={leftAside ? "toggle svg-icon show": "toggle svg-icon"}>
                     <svg viewBox="0 0 330 330">
@@ -363,73 +370,39 @@ const Dashboard = () =>{
                             </div>
                         </div>
                     </div><br/>
-                    {/* <div className="my-2"> 
-                        {!match.params.new ? (
+                     <div className="my-2"> 
                         <div className="oproto">
                             <div className="box">
                                 <div className="frame">
-                                    {user &&
-                                    <Link href={`/profile/${user._id}`}><a>
+                                    <div href={`/profile/${user._id}`}>
                                         <div className="avatar">
-                                            <img src={ user.avatar === 'default'?defaultImg:user.avatar} alt="avatar" />
+                                            <img src={ user.avatar === 'default'?'/default/defaultProfile.png':user.avatar} alt="avatar" />
                                         </div>
-                                   </a> </Link>
-                                    }
-                                    <Link href="/dashboard/create" className='opnin' onClick={()=>setPopupForm("opinion")}>We would like to hear from you...</Link>
+                                   </div>
+                                    <div className='opnin' onClick={()=>setState({...state, popupForm: "opinion"})}>We would like to hear from you...</div>
                                 </div>
                                 <div className="line"></div>
                                 <div className="pst-items">
-                                    <Link href="/dashboard/create" onClick={()=>setPopupForm("room")} role="button" className="pst-item svg-icon"><a>
+                                    <div onClick={()=>setState({...state, popupForm: "room"})} role="button" className="pst-item svg-icon">
                                         <svg viewBox="0 0 384 384"><g><g><path d="M368,176c-8.832,0-16,7.168-16,16c0,88.224-71.776,160-160,160S32,280.224,32,192S103.776,32,192,32
                                         c42.952,0,83.272,16.784,113.544,47.264c6.216,6.272,16.352,6.312,22.624,0.08c6.272-6.224,6.304-16.352,0.08-22.624
                                         C291.928,20.144,243.536,0,192,0C86.128,0,0,86.128,0,192s86.128,192,192,192s192-86.128,192-192C384,183.168,376.832,176,368,176
                                         z"></path></g></g><g><g><path d="M256,176h-48v-48c0-8.832-7.168-16-16-16c-8.832,0-16,7.168-16,16v48h-48c-8.832,0-16,7.168-16,16c0,8.832,7.168,16,16,16
                                         h48v48c0,8.832,7.168,16,16,16c8.832,0,16-7.168,16-16v-48h48c8.832,0,16-7.168,16-16C272,183.168,264.832,176,256,176z"></path></g></g></svg>
                                         <span>Build a room</span>
-                                    </a></Link>
-                                    <Link href="/dashboard/create" onClick={()=>setPopupForm("course")} role="button" className="pst-item svg-icon"><a>
+                                    </div>
+                                    <div onClick={()=>setState({...state, popupForm: "course"})} role="button" className="pst-item svg-icon">
                                         <svg style={{width:"26px",height:"26px"}} viewBox="0 0 1024 1024"><path d="M482.2656 696.6784l-212.765867 212.770133a27.733333 27.733333 0 1 1-39.223466-39.223466l173.546666-173.546667h78.442667z m129.591467 0l173.546666 173.546667a27.733333 27.733333 0 1 1-39.223466 39.223466l-212.765867-212.770133h78.442667z"  /><path d="M882.005333 230.4c0.785067 4.1472 1.194667 8.426667 1.194667 12.8v435.2c0 37.704533-30.562133 68.266667-68.266667 68.266667H209.066667c-37.704533 0-68.266667-30.562133-68.266667-68.266667V243.2c0-4.373333 0.4096-8.6528 1.194667-12.8H125.866667a27.733333 27.733333 0 1 1 0-55.466667h772.266666a27.733333 27.733333 0 1 1 0 55.466667h-16.128z m-51.272533 0H193.2672A8.878933 8.878933 0 0 0 192 234.986667v451.626666c0 4.8896 3.925333 8.853333 8.768 8.853334h622.464c4.842667 0 8.768-3.968 8.768-8.853334V234.986667c0-1.6768-0.465067-3.246933-1.2672-4.586667zM268.8 337.066667h179.2a25.6 25.6 0 0 1 0 51.2H268.8a25.6 25.6 0 1 1 0-51.2z m0 153.6h439.466667a25.6 25.6 0 0 1 0 51.2H268.8a25.6 25.6 0 0 1 0-51.2z m268.8-153.6h17.066667a25.6 25.6 0 0 1 0 51.2h-17.066667a25.6 25.6 0 0 1 0-51.2z"  /></svg>
                                         <span>Teach audience</span>
-                                    </a></Link>
-                                    <Link href="/dashboard/create" onClick={()=>setPopupForm("todo")} role="button" className="pst-item svg-icon"><a>
+                                    </div>
+                                    <div onClick={()=>setState({...state, popupForm: "todo"})} role="button" className="pst-item svg-icon">
                                         <svg viewBox="0 0 1024 1024"><path d="M273.066667 307.2m-34.133334 0a34.133333 34.133333 0 1 0 68.266667 0 34.133333 34.133333 0 1 0-68.266667 0Z" /><path d="M273.066667 512m-34.133334 0a34.133333 34.133333 0 1 0 68.266667 0 34.133333 34.133333 0 1 0-68.266667 0Z" /><path d="M887.466667 0H136.533333a34.133333 34.133333 0 0 0-34.133333 34.133333v955.733334a34.133333 34.133333 0 0 0 34.133333 34.133333h750.933334a34.133333 34.133333 0 0 0 34.133333-34.133333V34.133333a34.133333 34.133333 0 0 0-34.133333-34.133333zM853.333333 955.733333H170.666667V68.266667h682.666666z" /><path d="M375.466667 341.333333h341.333333a34.133333 34.133333 0 0 0 0-68.266666H375.466667a34.133333 34.133333 0 0 0 0 68.266666zM375.466667 546.133333h341.333333a34.133333 34.133333 0 0 0 0-68.266666H375.466667a34.133333 34.133333 0 0 0 0 68.266666zM375.466667 750.933333h341.333333a34.133333 34.133333 0 0 0 0-68.266666H375.466667a34.133333 34.133333 0 0 0 0 68.266666z" /><path d="M273.066667 716.8m-34.133334 0a34.133333 34.133333 0 1 0 68.266667 0 34.133333 34.133333 0 1 0-68.266667 0Z" /></svg>
                                         <span>Daily tasks</span>
-                                    </a></Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        ): match.params.new === "room"?(
-                            <div className="oproto mx-2">
-                                <h3 className="text-sm svg-icon text-bold my-3">New Room&nbsp;&nbsp;
-                                    <svg viewBox="0 0 512 512">
-                                        <g>
-                                            <g>
-                                                <path d="M508.875,248.458l-160-160c-4.167-4.167-10.917-4.167-15.083,0c-4.167,4.167-4.167,10.917,0,15.083l141.792,141.792
-                                                    H10.667C4.771,245.333,0,250.104,0,256s4.771,10.667,10.667,10.667h464.917L333.792,408.458c-4.167,4.167-4.167,10.917,0,15.083
-                                                    c2.083,2.083,4.813,3.125,7.542,3.125c2.729,0,5.458-1.042,7.542-3.125l160-160C513.042,259.375,513.042,252.625,508.875,248.458z
-                                                    "/>
-                                            </g>
-                                        </g>
-                                    </svg>
-                                </h3>
-                            </div>
-                        ): match.params.new === "todo" && (
-                            <div className="oproto mx-2">
-                                <h3 className="text-sm svg-icon text-bold my-3">Todo&nbsp;&nbsp;
-                                    <svg viewBox="0 0 512 512">
-                                        <g>
-                                            <g>
-                                                <path d="M508.875,248.458l-160-160c-4.167-4.167-10.917-4.167-15.083,0c-4.167,4.167-4.167,10.917,0,15.083l141.792,141.792
-                                                    H10.667C4.771,245.333,0,250.104,0,256s4.771,10.667,10.667,10.667h464.917L333.792,408.458c-4.167,4.167-4.167,10.917,0,15.083
-                                                    c2.083,2.083,4.813,3.125,7.542,3.125c2.729,0,5.458-1.042,7.542-3.125l160-160C513.042,259.375,513.042,252.625,508.875,248.458z
-                                                    "/>
-                                            </g>
-                                        </g>
-                                    </svg>
-                                </h3>
-                            </div>
-                        )}
-                    </div>*/}
+                    </div>
                     <div className="my-3">
                         <Courses courses={courses} />
                     </div>
