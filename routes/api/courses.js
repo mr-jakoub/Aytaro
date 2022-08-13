@@ -1,4 +1,6 @@
 const express = require('express')
+const uuid = require('uuid')
+const fs = require('fs')
 const router = express.Router()
 const auth = require('../../middleware/auth')
 const User = require('../../models/User')
@@ -14,35 +16,44 @@ router.post('/', [ auth, [
     check('title','Course title is required').not().isEmpty(),
     check('description','Course description is required').not().isEmpty(),
     check('categories','Include at least one category please').not().isEmpty(),
-    check('languages','Include at least one language please').not().isEmpty(),
+    check('language','Include at least one language please').not().isEmpty(),
     check('funds','Course price is required').not().isEmpty(),
+    check('level','Level is required').not().isEmpty(),
     check('sections','Please include at leat one section').not().isEmpty(),
 
 ] ], async (req,res)=>{
     const errors = validationResult(req)
     if(!errors.isEmpty()){
+        console.log(errors)
         return res.status(400).json({ errors: errors.array() })
     }
     try {
         const user = await User.findById(req.user.id).select('-password')
-        const { title, description, categories, languages, requirements, willLearn, funds, coupons, sections, thumbnail } = req.body
+        const { title, description, categories, languages, requirements, willLearn, funds, level, coupons, sections } = req.body
         // Fill Course fields
-        const courseFields = { user: user.id, avatar: user.avatar, name: user.name, title, description, coupons }
+        const courseFields = { user: user.id, avatar: user.avatar, name: user.name, title, description, coupons, level }
         for(const [key, value] of Object.entries(courseFields)) {
             if (value && value.length > 0) {
                 courseFields[key] = value
             }
         }
         // Funds
-        courseFields.funds = funds
+        courseFields.funds = JSON.parse(funds)
         // Handle arrays
-        if(!thumbnail) courseFields.thumbnail = "/default/defaultThumbnail.jpg"
-        if(categories) courseFields.categories = categories.split(',').map(category=>category.trim())
+        if(categories) courseFields.categories = categories
         if(languages) courseFields.languages = languages.split(',').map(language=>language.trim())
-        if(requirements) courseFields.requirements = requirements.split(',').map(requirement=>requirement)
-        if(willLearn) courseFields.willLearn = willLearn.split(',').map(willLearnItem=>willLearnItem)
+        if(requirements) courseFields.requirements = requirements
+        if(willLearn) courseFields.willLearn = willLearn
+        // Thumbnail
+        const courseId = uuid.v4()
+        const courseDir = `./client/public/courses/course@${courseId}&&user@${user.id}`
+        if(!fs.existsSync(courseDir)){
+            await fs.mkdirSync(courseDir)
+            req.files.thumbnail.mv(`./client/public/courses/course@${courseId}&&user@${user.id}/${req.files.thumbnail.name.replace(' ','')}`)
+            courseFields.thumbnail = `/courses/course@${courseId}&&user@${user.id}/${req.files.thumbnail.name.replace(' ','')}`
+        }
         // Build sections [{...},{...}]
-        courseFields.sections = sections
+        courseFields.sections = JSON.parse(sections)
         const newCourse = new Course(courseFields)
         const course = await newCourse.save()
 
@@ -77,6 +88,7 @@ router.put('/rise/:id', auth, async (req,res)=>{
         await course.save()
         res.json(course.rises)
     } catch (err) {
+        console.log(err)
         res.status(500).send('Server Error')
     }
 })

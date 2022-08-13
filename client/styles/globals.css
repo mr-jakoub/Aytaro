@@ -86,6 +86,13 @@ a.official:hover{
   font-size: 1rem !important;
   font-weight: bolder !important
 }
+.mini-label{
+  position: relative;
+  display: block;
+  color: var(--Grey-color);
+  margin: .5rem 0;
+  font-size: .78rem;
+}
 ul{list-style: none}
 img{width: 100%}
 .overflow-hidden{overflow: hidden}
@@ -160,6 +167,9 @@ svg.gooey{
 ::placeholder,
 input[type=date]::-webkit-datetime-edit{
   color: var(--Grey-color)
+}
+input[type=file]{
+  display: none;
 }
 a:not(.logo):hover{
   color: var(--Primary-color)
@@ -471,11 +481,12 @@ font-weight: 300
   border: none;
   background: var(--Light-color);
   color: var(--Dark-color);
+  box-shadow: inset 0 0 1.5px var(--shadow-sm);
   display: block;
   width: 100%;
   max-width: 100%;
   max-height: 100%;
-  padding: 0.6rem 1rem;
+  padding: .6rem 1rem;
   font-size: .9rem;
   margin: 1rem 0;
   border-radius: var(--Radius-xs)
@@ -548,7 +559,6 @@ textarea.input-item{
   padding: 2rem .5rem;
   margin: 0 0.35rem
 }
-
 /* For Dashboard */
 .navbar .dashboard li{
   margin: 0 1rem
@@ -563,7 +573,6 @@ textarea.input-item{
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  margin-left: .3rem
 }
 .navbar .dashboard li.user a{
   padding: 0 .2rem
@@ -1704,8 +1713,21 @@ aside ul li .languages a{
 .postForm .box .body{
   position: relative;
   width: 100%;
+  margin: 0;
   padding: 0 .8rem
 }
+.postForm .box .body .next-form{
+  animation: move-chevron 1s ease-out infinite alternate;
+}
+@keyframes move-chevron {
+  0%{
+   opacity: 1;
+  }
+  100%{
+   opacity: .1;
+  }
+ }
+
 .postForm .box .body .forms{
   position: relative;
   display: flex;
@@ -1713,19 +1735,90 @@ aside ul li .languages a{
   flex-wrap: nowrap;
   transform: translateX(var(--formSlideWidth)) scale(1)
 }
+.postForm .box .body .forms .col-12{
+  max-height: 342px;
+  min-height: 342px;
+  overflow: hidden;
+  overflow-y: scroll;
+}
 .postForm .box .body .forms.next{
-  animation: formSlideWidth 1s cubic-bezier(.6, 0, 0, .2) forwards
+  animation: formSlideWidth 700ms cubic-bezier(.6, 0, 0, .2) forwards
 }
 @keyframes formSlideWidth{
   0%{
     transform: translateX(var(--oldFormSlideWidth));
   }
   50%{
-    transform: translateX(calc(var(--oldFormSlideWidth) + 5%));
+    transform: translateX(calc(var(--oldFormSlideWidth) + 2%));
   }
   100%{
     transform: translateX(var(--formSlideWidth));
   }
+}
+.postForm .box .body .forms .select-groupe{
+  position: relative;
+}
+.postForm .box .body .forms .select-groupe select{
+  appearance: none;
+}
+.postForm .box .body .forms .select-groupe select option{
+  color: var(--Dark-color);
+  font-size: .9rem;
+}
+.postForm .box .body .forms .select-groupe .select-arrow{
+  position: absolute;
+  right: .7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+  z-index: 2
+}
+.postForm .box .body .forms .select-groupe #hashtag{
+  width: 11px;
+  height: 11px;
+  pointer-events: none
+}
+.postForm .box .body .forms .select-groupe .select-items{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  max-height: 33px;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 .3rem;
+  margin: 0;
+  pointer-events: none
+}
+.postForm .box .body .forms .select-groupe .select-items .select-item{
+  font-size: .8rem;
+  pointer-events: visible;
+  position: relative;
+  cursor: pointer;
+  margin: .3rem;
+  background: var(--White-color);
+  overflow: hidden;
+  color: var(--Dark-color);
+  padding: 0 .5rem 0 0;
+  border-radius: 5px;
+  text-align: center;
+  user-select: none;
+  vertical-align: middle
+}
+.postForm .box .body .forms .select-groupe .select-items svg{
+  width: 18px;
+  height: 18px;
+}
+.postForm .box .body svg.delete:hover{
+  background: #ffffff;
+  fill: var(--Primary-color);
+  cursor: pointer;
+  transition: 200ms ease-in-out;
 }
 .postForm .box .body .overpop.active{ transform: translateX(0%); }
 .postForm .box .body textarea{
@@ -1737,6 +1830,7 @@ aside ul li .languages a{
   font-size: 1rem;
   padding: .7rem .5rem;
   color: var(--Dark-color);
+  background: var(--Light-color);
   box-shadow: inset 0 0 1.5px var(--shadow-sm);
   border-radius: var(--Radius-xs);
   margin: .5rem 0;
@@ -1744,12 +1838,207 @@ aside ul li .languages a{
   resize: none;
   min-height: 90px;
   max-height: 120px;
-  background: transparent;
   border: none;
   outline: none
 }
 .postForm .box .body textarea.title{
   min-height: 45px;
+}
+.postForm .box .body .input-groupe{
+  display: flex;
+  flex-direction: column;
+  margin: 1rem 0;
+}
+.postForm .box .body .input-groupe label{
+  font-size: .9rem;
+  font-weight: 200;
+}
+.postForm .box .body .input-groupe .input-file{
+  position: relative;
+  color: var(--Grey-color);
+  font-weight: lighten;
+  font-size: .8rem;
+}
+.postForm .box .body .input-groupe .thumbnail{
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  border: 1px solid #24252670;
+  width: 120px;
+  height: 120px;
+  overflow: hidden;
+}
+.postForm .box .body .input-groupe .thumbnail svg{
+  width: 50%;
+  height: 50%;
+}
+.postForm .box .body .input-groupe .thumbnail img{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  border-radius: 5px;
+  width: 95%;
+  height: 95%;
+  object-fit: cover;
+  z-index: 2;
+}
+.postForm .box .body .input-groupe .input-file .select-arrow{
+  position: absolute;
+  right: .7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  fill: var(--Dark-color);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  z-index: 2
+}
+.postForm .box .body .input-groupe .input-item{
+  margin: .5rem 0;
+}
+.postForm .box .body .input-groupe .add-answer svg{
+  width: 15px;
+  height: 15px;
+  margin-right: .5rem;
+  fill: var(--Primary-color);
+}
+.postForm .box .body .input-groupe .add-answer{
+  color: var(--Primary-color);
+  cursor: pointer;
+  user-select: none;
+}
+.postForm .box .body .input-groupe .answer-item{
+  display: flex;
+  flex-direction: row;
+}
+.postForm .box .body .input-groupe .answer-item svg.delete{
+  margin-right: .3rem;
+}
+/* Course Sections */
+.postForm .box .body .section-groupe{
+  position: relative;
+  box-shadow: inset 0 0 1.5px var(--shadow-sm);
+  padding: .4rem .7rem;
+  padding-top: 1.9rem;
+  margin: 1rem 0;
+  background: var(--Light-color);
+  transform-origin: top;
+  transition: 50ms cubic-bezier(0, 0, 1, 1);
+  overflow: hidden;
+  height: 0;
+  border-radius: var(--Radius-xs)
+}
+.postForm .box .body .section-groupe.active{
+  padding-top: 2.7rem;
+  height: inherit;
+}
+.postForm .box .body .section-groupe .sub-title{
+  font-size: .85rem;
+  font-weight: 100;
+  letter-spacing: 1px;
+  color: var(--Grey-color);
+}
+.postForm .box .body .add-video{
+  position: relative;
+  text-align: left;
+  padding: .1rem 0;
+  width: 2.5rem;
+  height: 1.5rem;
+  border: 1px dashed var(--Dark-color);
+  opacity: .2;
+  transition: 100ms ease;
+  border-radius: 3px;
+  user-select: none;
+  display: inline-block;
+  font-size: .88rem;
+  cursor: pointer;
+}
+.postForm .box .body .add-video:hover{
+  opacity: 1;
+}
+.postForm .box .body .add-video::before{
+  content: '';
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  height: 1rem;
+  width: 1rem;
+  border: 1px dashed var(--Dark-color);
+  border-bottom: 0;
+  border-left: 0;
+  background: var(--White-color);
+  transform: rotate(45deg) translateY(-75%);
+}
+.postForm .box .body .add-video svg{
+  width: 13px;
+  fill: var(--Grey-color);
+  margin-left: .8rem;
+  height: 13px;
+}
+.postForm .box .body .section-groupe .section-items{
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: .4rem;
+  width: 100%;
+}
+.postForm .box .body .section-groupe .section-items .section-item{
+  margin: 0 .5rem;
+  user-select: none;
+  cursor: pointer;
+  border-radius: var(--Radius-xs);
+  padding: .3rem .5rem;
+  font-size: .9rem;
+  background: var(--Smooth-Back);
+  font-weight: 200;
+}
+.postForm .box .body .section-groupe .section-items .section-item svg{
+  width: 14px;
+  height: 14px;
+}
+.postForm .box .body .section-groupe .section-head{
+  position: absolute;
+  background: var(--White-color);
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.postForm .box .body .section-groupe .section-head .section-title{
+  font-size: .9rem;
+  width: 100%;
+  display: block;
+  box-shadow: inset 0 0 1.5px var(--shadow-sm);
+  color: var(--Dark-color);
+  padding: .7rem 1rem;
+  outline: none;
+  border: none;
+  background: transparent;
+}
+.postForm .box .body .section-groupe .section-head .addons{
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  right: .7rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.postForm .box .body .section-groupe .section-head .addons svg{
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+}
+.postForm .box .body .section-groupe .section-head .addons-item{
+  margin-left: .5rem;
+}
+.postForm .box .body .section-groupe .section-head .delete-item svg{
+  width: 22px;
+  height: 22px;
 }
 .postForm .box .body .moreinfo{
   position: relative;
@@ -1764,21 +2053,24 @@ aside ul li .languages a{
 .postForm .box .body .moreinfo p{
   margin: 0 .5rem;
 }
-.postForm .box .svg-icon{
+.postForm .box .items .svg-icon,
+.postForm .box .header .svg-icon{
   margin: 0 .5rem;
   padding: .3rem;
   border-radius: 50%;
   transition: 100ms cubic-bezier(0, 0, 1, 1);
   cursor: pointer
 }
-.postForm .box .svg-icon:hover,
-.postForm .box .svg-icon.active{
+.postForm .box .items .svg-icon:hover,
+.postForm .box .header .svg-icon:hover,
+.postForm .box .items .svg-icon.active,
+.postForm .box .header .svg-icon.active{
   background: var(--White-color-secondary)
 }
 .postForm .box .svg-icon.active:hover{
   background: var(--Black-color)
 }
-.postForm .box .svg-icon:active{
+.postForm .box .svg-icon.svg-button:active{
   transform: scale(.969)
 }
 .postForm .box .body .moreinfo svg{
@@ -2164,10 +2456,9 @@ aside ul li .languages a{
   letter-spacing: 1.5px;
   color: var(--Dark-color);
   line-height: 2.1rem;
-  font-size: .88em;
+  font-size: .83em;
   font-weight: 400;
   overflow-wrap: anywhere;
-  padding: 0 1rem;
   white-space: pre-wrap;
   text-align: start;
   user-select: text
@@ -2175,7 +2466,6 @@ aside ul li .languages a{
 .content .posts .post .body .info{
   position: relative;
   overflow: hidden;
-  margin-bottom: 1rem;
   /*max-height: 0;*/
   transition: 0.15s ease-out
 }
@@ -2190,6 +2480,9 @@ aside ul li .languages a{
 }*/
 .content .posts .post .body .inline-betwwen{
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
   font-size: 1rem;
   padding: 0 1rem;
   letter-spacing: .05em;
@@ -2203,10 +2496,10 @@ aside ul li .languages a{
   justify-content: flex-start;
   flex-wrap: wrap;
   height: 100%;
+  margin: .5rem 0;
   color: var(--Dark-color);
   font-size: .82rem;
   font-weight: 200;
-  margin-top: 1rem;
 }
 .content .posts .post .body .inline-betwwen .second-cred .vline{
   height: 22px;
@@ -2297,8 +2590,7 @@ aside ul li .languages a{
   position: relative;
   display: block;
   font-size: 1.05rem;
-  margin: 0 1rem;
-  margin-bottom: .8rem;
+  margin-bottom: .5rem;
 }
 .content .posts .post .nmbrs{
   position: relative;

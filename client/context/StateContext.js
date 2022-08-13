@@ -53,7 +53,7 @@ export const StateContext = ({ children }) =>{
         }
         const body = JSON.stringify({ email, password })
         try {
-            const res = await axios.post('http://localhost:5000/api/auth',body,config)
+            const res = await axios.post('http://localhost:5000/api/auth', body, config)
             setCookie("token",res.data.token)
             fetchers.loadUser()
             setState({...state, user: res.data})
@@ -90,21 +90,39 @@ export const StateContext = ({ children }) =>{
             }
         }
     }
+    // Add course
+    const addCourse = async formData => {
+        const config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        try {
+            await axios.post('http://localhost:5000/api/courses', formData, config)
+            setAlert('Course created Successfully','success')
+        } catch (err) {
+            setAlert(err.response.statusText,'danger')
+        }
+    }
 
     return(
         <Context.Provider value={{
             state,
             setState,
 
+            // Alerts
             alerts,
             setAlert,
 
+            // User
+            getProfileById,
             register,
             login,
             logout,
-
-            getProfileById,
-            addRise
+            
+            // Courses
+            addRise,
+            addCourse
         }}>
             {children}
         </Context.Provider>

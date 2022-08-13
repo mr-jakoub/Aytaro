@@ -26,10 +26,6 @@ const Dashboard = ({ user }) =>{
             setLoggedIn(false)
         }
     },[])
-    useEffect(()=>{
-        setState({...state, user})
-        console.log(state)
-    },[])
 
     return loggedIn === true ?
     <div className="loggedIn">

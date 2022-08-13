@@ -23,11 +23,15 @@ const CourseSchema = new Schema({
         required: true
     },
     requirements:{
-        type: [String],
+        type: [Object],
         default: ['No requirements']
     },
     willLearn:{
-        type: [String],
+        type: [Object],
+        required: true
+    },
+    level:{
+        type: String,
         required: true
     },
     funds:[
@@ -42,9 +46,6 @@ const CourseSchema = new Schema({
             }
         }
     ],
-    coupons:{
-        type: [String]
-    },
     avatar:{
         type: String
     },
@@ -132,16 +133,13 @@ const CourseSchema = new Schema({
                         type: String,
                         required: true
                     },
-                    duration:{
-                        type: Number
-                    },
                     public:{
                         type: Boolean,
                         default: false
                     }
                 }
             ],
-            ressources:[
+            resources:[
                 {
                     directory:{
                         type: String
