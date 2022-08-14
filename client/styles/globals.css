@@ -2494,7 +2494,7 @@ aside ul li .languages a{
 .content .posts .post .body .inline-betwwen .second-cred{
   display: flex;
   justify-content: flex-start;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   height: 100%;
   margin: .5rem 0;
   color: var(--Dark-color);

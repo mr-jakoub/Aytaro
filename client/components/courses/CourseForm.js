@@ -141,12 +141,25 @@ const CourseForm = () => {
         courseData.append('level', level)
         courseData.append('funds', JSON.stringify(funds))
         courseData.append('thumbnail', thumbnail)
-        courseData.append('sections', JSON.stringify(sections))
+        // Append videos to sections
+        sections.forEach(section=>{
+            section.videos.forEach(video=>{
+                courseData.append(`video__${section.title.split('@')[1]}`, video.directory)
+            })
+        })
+        // Build sections
+        let newSections = []
+        sections.forEach((section, key)=>{
+            newSections.push({title: section.title, videos:[], resources:[]})
+            section.videos.forEach(video=>{
+                newSections[key].videos.push({title: video.title, directory: '', public: video.public})
+            })
+        })
+        courseData.append('sections', JSON.stringify(newSections))
         addCourse(courseData)
-        console.log(courseData)
     }
     // Section groupe
-    const [dropDown, setDropDown] = useState([{id:"main-section"}])
+    const [dropDown, setDropDown] = useState([{id:"main_section"}])
     const handleDropDown = id =>{
         let newDropDown = dropDown.length > 0 ? dropDown.map(item=> item) : []
         if(newDropDown.filter(item=> item.id === id).length > 0){
@@ -161,9 +174,9 @@ const CourseForm = () => {
         addVideo: false,
         addSection: true
     })
-    const [addItem, setAddItem] = useState([{id: 'main-section', type:'section', index:'0', title: 'Introduction'}])
+    const [addItem, setAddItem] = useState([{id: 'main_section', type:'section', index:'0', title: 'Introduction'}])
     const handleAddItem = (type, pos) =>{
-        const id = uuidv4()
+        const id = uuidv4().replaceAll('-','_')
         let index = pos ? pos : id
         let addItemNew = addItem.length > 0 ? addItem.map(item=> item) : []
         addItemNew.push({id: id, type, index, title:''})
