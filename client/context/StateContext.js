@@ -3,10 +3,12 @@ import { setCookie, deleteCookie } from 'cookies-next'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
 import fetchers from "../utils/fetchers"
+import { useRouter } from 'next/router'
 
 const Context = createContext()
 
 export const StateContext = ({ children }) =>{
+    const router = useRouter()
     // Global state
     const [state, setState] = useState({
         user: null,
@@ -70,6 +72,7 @@ export const StateContext = ({ children }) =>{
         deleteCookie('token')
         setState({...state, user: null})
         setAlert('See you next time.','success')
+        router.push('/login')
     }
     // Get profile by ID
     const getProfileById = async (userId) => {
@@ -94,12 +97,18 @@ export const StateContext = ({ children }) =>{
     const addCourse = async formData => {
         const config = {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'multipart/form-data'
+            },
+            onUploadProgress: (progressEvent) => {
+                return Math.round(
+                  (progressEvent.loaded * 100) / progressEvent.total
+                )
             }
         }
         try {
             await axios.post('http://localhost:5000/api/courses', formData, config)
             setAlert('Course created Successfully','success')
+            return config.onUploadProgress
         } catch (err) {
             setAlert(err.response.statusText,'danger')
         }

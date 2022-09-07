@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import Link from "next/link"
+import axios from 'axios'
 import TextareaAutosize from 'react-autosize-textarea'
 import userNameHandler from '../../utils/userNameHandler'
 import feelings from '../../utils/feelings.json'
@@ -9,15 +9,17 @@ import fetchers from '../../utils/fetchers'
 import useSWR from 'swr'
 
 const CourseForm = () => {
-    const { state, setState, addCourse } = useStateContext()
+    const { state, setState, setAlert } = useStateContext()
     const user = useSWR('/api/auth', fetchers.loadUser).data
     const [activeBox, setActiveBox] = useState({
         backPage: false,
         next: false,
+        submited: false,
         oldFormSlideWidth: 0,
-        formSlideWidth: 0
+        formSlideWidth: 0,
+        animateFormWidth: 0
     })
-    const { backPage, oldFormSlideWidth, formSlideWidth, next } = activeBox
+    const { backPage, oldFormSlideWidth, formSlideWidth, animateFormWidth, next, submited } = activeBox
     // Create post
     const [formData, setFormData] = useState({
         title: '',
@@ -27,7 +29,10 @@ const CourseForm = () => {
         willLearnList: [],
         requirementsList: [],
         level: '',
-        funds: [],
+        funds: {
+            price: '',
+            currency: 'USD'
+        },
         thumbnail: null,
         sections: []
     })
@@ -46,21 +51,19 @@ const CourseForm = () => {
         setFormData({...formData, [e.target.name]: selected})
     }
     // Next form
-    const [nextForm, setNextForm] = useState(false)
-    const handleNextBack = type =>{
+    const handleNextBack = (bubbles) =>{
+                //case 'next':
+                    //setActiveBox({...activeBox, formSlideWidth: formSlideWidth + 100, oldFormSlideWidth: formSlideWidth === 0 ? 0 : oldFormSlideWidth > formSlideWidth ? oldFormSlideWidth - 100 : oldFormSlideWidth + 100, next: true, animateFormWidth: 2 })
+                //case 'back':
+                    //setActiveBox({...activeBox, formSlideWidth: formSlideWidth - 100, oldFormSlideWidth: oldFormSlideWidth > formSlideWidth ? oldFormSlideWidth - 100 : oldFormSlideWidth + 100, next: true, animateFormWidth: -2 })
         if(!next){
-            setNextForm(false)
-            switch(type){
-                case 'next':
-                    setActiveBox({...activeBox, formSlideWidth: formSlideWidth + 100, oldFormSlideWidth : formSlideWidth === 0 ? 0 : oldFormSlideWidth > formSlideWidth ? oldFormSlideWidth - 100 : oldFormSlideWidth + 100, next: true })
-                    break
-                case 'back':
-                    setActiveBox({...activeBox, formSlideWidth: formSlideWidth - 100, oldFormSlideWidth : oldFormSlideWidth > formSlideWidth ? oldFormSlideWidth - 100 : oldFormSlideWidth + 100, next: true })
-                    break
-                default: return
+            if(formSlideWidth > bubbles){
+                setActiveBox({...activeBox, formSlideWidth: bubbles, oldFormSlideWidth: formSlideWidth, next: true, animateFormWidth: -1 })
+            }else if(formSlideWidth < bubbles){
+                    setActiveBox({...activeBox, formSlideWidth: bubbles, oldFormSlideWidth: formSlideWidth, next: true, animateFormWidth: 1 })
             }
+            return
         }
-        return
     }
     // Add answer
     const [willLearn, setWillLearn] = useState([])
@@ -96,7 +99,11 @@ const CourseForm = () => {
         }
         if(exists){
             let itemIndex = newAnswer.findIndex(item => item.key === key)
-            newAnswer[itemIndex].value = e.target.value
+            if(e.target.value.length > 0){
+                newAnswer[itemIndex].value = e.target.value
+            }else{
+                newAnswer = newAnswer.filter(item => item.key !== key)
+            }
         }else{
             newAnswer.push({
                 key,
@@ -119,15 +126,15 @@ const CourseForm = () => {
             setFormData({...formData,thumbnail: e.target.files[0]})
         }
     }
-    const onSubmit = e =>{
+
+    const [ uploadProgress, setUploadProgress ] = useState({
+        percentage: '',
+        loaded: '',
+        total: ''
+    })
+    const { percentage, loaded, total } = uploadProgress
+    const onSubmit = async (e) =>{
         e.preventDefault()
-        // setFormData({
-        //     title: '',
-        //     description: '',
-        //     feeling: '',
-        //     location: '',
-        //     language: []
-        // })
         let courseData = new FormData()
         // for ( var key in formData ) {
         //     courseData.append(key, formData[key]);
@@ -145,6 +152,7 @@ const CourseForm = () => {
         sections.forEach(section=>{
             section.videos.forEach(video=>{
                 courseData.append(`video__${section.title.split('@')[1]}`, video.directory)
+
             })
         })
         // Build sections
@@ -156,7 +164,22 @@ const CourseForm = () => {
             })
         })
         courseData.append('sections', JSON.stringify(newSections))
-        addCourse(courseData)
+        setActiveBox({...activeBox, submited: true})
+        // Post
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+            onUploadProgress: (progressEvent) => {
+                setUploadProgress({...uploadProgress,percentage: Math.round((progressEvent.loaded * 100) / progressEvent.total), loaded: progressEvent.loaded, total: progressEvent.total})
+            }
+        }
+        try {
+            await axios.post('http://localhost:5000/api/courses', courseData, config)
+            setAlert('Course created Successfully','success')
+        } catch (err) {
+            setAlert(err.response.statusText,'danger')
+        }
     }
     // Section groupe
     const [dropDown, setDropDown] = useState([{id:"main_section"}])
@@ -217,9 +240,95 @@ const CourseForm = () => {
         })
         setFormData({...formData, sections: affector})
     }
+    // Progress
+    const [ progress, setProgress ] = useState({
+        f1: 0,
+        f2: 0,
+        f3: 0,
+        f4: 0
+    })
+    const { f1, f2, f3, f4 } = progress
     useEffect(()=>{
-        console.log(formData)
-    },[formData])
+        // Conditions
+        let titleCond = title.length > 6, descriptionCond = description.length > 15, categoriesCond = categories.length > 0
+        let trueConditions = []
+        if(titleCond) trueConditions.push(titleCond)
+        if(descriptionCond) trueConditions.push(descriptionCond)
+        if(categoriesCond) trueConditions.push(categoriesCond)
+
+        switch(trueConditions.length){
+            case 3: setProgress({...progress,f1: 1})
+            break
+            case 2: setProgress({...progress,f1: 2/3})
+            break
+            case 1: setProgress({...progress,f1: 1/3})
+            break
+            default: setProgress({...progress,f1: 0})
+        }
+    },[title, description, categories])
+    useEffect(()=>{
+        // Conditions
+        let languageCond = language.length > 0, willLearnCond = willLearnList.length > 1, requirementsCond = requirementsList.length > 1
+        let trueConditions = []
+        if(languageCond) trueConditions.push(languageCond)
+        if(willLearnCond) trueConditions.push(willLearnCond)
+        if(requirementsCond) trueConditions.push(requirementsCond)
+
+        switch(trueConditions.length){
+            case 3: setProgress({...progress,f2: 1})
+            break
+            case 2: setProgress({...progress,f2: 2/3})
+            break
+            case 1: setProgress({...progress,f2: 1/3})
+            break
+            default: setProgress({...progress,f2: 0})
+        }
+    },[language, willLearnList, requirementsList])
+    useEffect(()=>{
+        // Conditions
+        let levelCond = level.length > 0, thumbnailCond = thumbnail !== null, fundsCond = funds.price.length > 0 && funds.currency.length > 0
+        let trueConditions = []
+        if(levelCond) trueConditions.push(levelCond)
+        if(thumbnailCond) trueConditions.push(thumbnailCond)
+        if(fundsCond) trueConditions.push(fundsCond)
+
+        switch(trueConditions.length){
+            case 3: setProgress({...progress,f3: 1})
+            break
+            case 2: setProgress({...progress,f3: 2/3})
+            break
+            case 1: setProgress({...progress,f3: 1/3})
+            break
+            default: setProgress({...progress,f3: 0})
+        }
+    },[level, funds, thumbnail])
+    useEffect(()=>{
+        // Conditions
+        let trueConditions = []
+        if(sections.length > 0){
+            if(sections[0].videos.length > 0){
+                if((sections[0].videos[0].directory) && (sections[0].videos[0].title) && (sections[0].title.length > 0)){
+                    trueConditions.push(true)
+                    if(sections.length > 1){
+                        if(sections[1].videos.length > 0){
+                            if((sections[1].videos[0].directory) && (sections[1].videos[0].title) && (sections[1].title.length > 1)) trueConditions.push(true)
+                        }
+                    }
+                }
+            }
+        }
+        console.log(trueConditions)
+        switch(trueConditions.length){
+            case 2: setProgress({...progress,f4: 1})
+            break
+            case 1: setProgress({...progress,f4: 1/2})
+            break
+            default: setProgress({...progress,f4: 0})
+        }
+    },[sections])
+    useEffect(()=>{
+    console.log(uploadProgress)
+    },[uploadProgress])
   return (
     <div className='postForm'>
         <div className="box">
@@ -230,25 +339,30 @@ const CourseForm = () => {
                 </span>
             </div>
             <div className="line"></div>
-            <div className="inner">
-                <div className="head">
-                    <div className="off-user">
-                        <Link href={`/profile/${user._id}`}><a>
-                            <div className="avatar">
-                                <img src={user.avatar === "default"?'/default/defaultProfile.png':user.avatar} alt="avatar" />
-                            </div>
-                        </a></Link>
-                        <div className="user-info">
-                            <div className="inline">
-                                <span className="text-bold underline"><Link href={`/profile/${user._id}`} title={user.name}><a>{userNameHandler(user.name)}</a></Link></span>
-                            </div>
-                            <span className="date underline" title='Just now'>Just now</span>
-                        </div>
-                    </div>
+            <div className="progress">
+                <div className="progress-line">
+                    <span className='active'></span>
+                    <span style={{"--progress-f1": `${f1}`}}></span>
+                    <span style={{"--progress-f2": `${f2}`}}></span>
+                    <span style={{"--progress-f3": `${f3}`}}></span>
+                    <span style={{"--progress-f4": `${f4}`}}></span>
                 </div>
+                <span style={formSlideWidth === 0 ?{'borderColor':'var(--Primary-color)'}:{'borderColor':'var(--Smooth-Back)'}} className={f1 === 1 ? "bubble active" : "bubble" } onClick={()=> handleNextBack(0)}>
+                    <svg viewBox="0 0 512 512"><path d="M504.502,75.496c-9.997-9.998-26.205-9.998-36.204,0L161.594,382.203L43.702,264.311c-9.997-9.998-26.205-9.997-36.204,0 c-9.998,9.997-9.998,26.205,0,36.203l135.994,135.992c9.994,9.997,26.214,9.99,36.204,0L504.502,111.7 C514.5,101.703,514.499,85.494,504.502,75.496z"></path></svg><span className='step'>1</span>
+                </span>
+                <span  style={formSlideWidth === 100 ?{'borderColor':'var(--Primary-color)'}:{'borderColor':'var(--Smooth-Back)'}} className={f2 === 1 ? "bubble active" : "bubble" } onClick={()=> handleNextBack(100)}>
+                    <svg viewBox="0 0 512 512"><path d="M504.502,75.496c-9.997-9.998-26.205-9.998-36.204,0L161.594,382.203L43.702,264.311c-9.997-9.998-26.205-9.997-36.204,0 c-9.998,9.997-9.998,26.205,0,36.203l135.994,135.992c9.994,9.997,26.214,9.99,36.204,0L504.502,111.7 C514.5,101.703,514.499,85.494,504.502,75.496z"></path></svg><span className='step'>2</span>
+                </span>
+                <span  style={formSlideWidth === 200 ?{'borderColor':'var(--Primary-color)'}:{'borderColor':'var(--Smooth-Back)'}} className={f3 === 1 ? "bubble active" : "bubble" } onClick={()=> handleNextBack(200)}>
+                    <svg viewBox="0 0 512 512"><path d="M504.502,75.496c-9.997-9.998-26.205-9.998-36.204,0L161.594,382.203L43.702,264.311c-9.997-9.998-26.205-9.997-36.204,0 c-9.998,9.997-9.998,26.205,0,36.203l135.994,135.992c9.994,9.997,26.214,9.99,36.204,0L504.502,111.7 C514.5,101.703,514.499,85.494,504.502,75.496z"></path></svg><span className='step'>3</span>
+                </span>
+                <span  style={formSlideWidth === 300 ?{'borderColor':'var(--Primary-color)'}:{'borderColor':'var(--Smooth-Back)'}} className={f4 === 1 ? "bubble active" : "bubble" } onClick={()=> handleNextBack(300)}>
+                    <svg viewBox="0 0 512 512"><path d="M504.502,75.496c-9.997-9.998-26.205-9.998-36.204,0L161.594,382.203L43.702,264.311c-9.997-9.998-26.205-9.997-36.204,0 c-9.998,9.997-9.998,26.205,0,36.203l135.994,135.992c9.994,9.997,26.214,9.99,36.204,0L504.502,111.7 C514.5,101.703,514.499,85.494,504.502,75.496z"></path></svg><span className='step'>4</span>
+                </span>
             </div>
+            <div className="line"></div>
             <form onSubmit={e =>onSubmit(e)} className="body" encType="multipart/form-data">
-                <div style={{"--formSlideWidth": `-${formSlideWidth}%`, "--oldFormSlideWidth": `-${oldFormSlideWidth}%` }} className={next ? "forms row next" : "forms row" } onAnimationEnd={()=>setActiveBox({...activeBox, next: false })}>
+                <div style={{"--formSlideWidth": `-${formSlideWidth}%`, "--oldFormSlideWidth": `-${oldFormSlideWidth}%`, "--animateFormWidth": `${animateFormWidth}%` }} className={next ? "forms row next" : "forms row" } onAnimationEnd={()=>setActiveBox({...activeBox, next: false })}>
                     <div className="col-12">
                         <div className="input-groupe">
                             <label htmlFor="title">Title</label>
@@ -383,12 +497,8 @@ const CourseForm = () => {
                                 </select>
                             </div>
                         </div>
-                        <div className="input-groupe">
+                        <div className="input-groupe no-price">
                             <div className="row">
-                                <div className="col-6">
-                                    <label htmlFor="price">Price</label>
-                                    <input name='price' onChange={e=>handlePriceChange(e)} id='price' type="text" className='input-item' placeholder='Example: 100' />
-                                </div>
                                 <div className="col-6">
                                     <label htmlFor="currency">Currency</label>
                                     <div className="select-groupe">
@@ -397,21 +507,41 @@ const CourseForm = () => {
                                             c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393
                                             s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"/>
                                         </svg>
-                                        <select defaultValue='Default' className='input-item' id="currency" name='currency' onChange={e=>handlePriceChange(e)}>
+                                        <select defaultValue='USD' className='input-item' id="currency" name='currency' onChange={e=>handlePriceChange(e)}>
                                             <option value="DZD">Algerian Dinar</option>
                                             <option value="USD">US Dollar</option>
                                             <option value="EUR">Euro</option>
-                                            <option disabled className='d-none' value="Default">Select a currency</option>
                                         </select>
                                     </div>
                                 </div>
+                                {funds.currency.length > 0 &&<div className="col-6">
+                                    <label htmlFor="price">Price</label>
+                                    <div className="select-groupe">
+                                        <svg className='select-arrow' viewBox="0 0 330 330">
+                                            <path d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393
+                                            c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393
+                                            s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"/>
+                                        </svg>
+                                        <select defaultValue='Default' className='input-item' id="price" name='price' onChange={e=>handlePriceChange(e)}>
+                                            <option value="free">Free</option>
+                                            <option value="5">5{funds.currency}</option>
+                                            <option value="10">10{funds.currency}</option>
+                                            <option value="20">20{funds.currency}</option>
+                                            <option value="40">40{funds.currency}</option>
+                                            <option value="100">100{funds.currency}</option>
+                                            <option value="150">150{funds.currency}</option>
+                                            <option value="200">200{funds.currency}</option>
+                                            <option disabled className='d-none' value="Default">Select</option>
+                                        </select>
+                                    </div>
+                                </div>}
                             </div>
                         </div>
                         <div className="input-groupe">
                             <div className="row">
                                 <div className="col-8">
                                     <label htmlFor="thumbnail">Select a thumbnail</label>
-                                    <span className='mini-label'>Accepted files : format .jpg, .jpeg,. gif, or .png</span>
+                                    <span className='mini-label'>Accepted files : format .jpg, .jpeg, .gif or .png</span>
                                     <input accept=".gif,.jpg,.jpeg,.png" id='thumbnail' onChange={handelFileChange} type="file" />
                                     <label htmlFor="thumbnail" className='input-item input-file' type="file">{thumbnail ? thumbnail.name : 'No file selected'}
                                         <svg className='select-arrow svg-button' viewBox="0 0 294.156 294.156">
@@ -454,7 +584,7 @@ const CourseForm = () => {
                                             s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"/>
                                         </svg>
                                     </div>
-                                    {section.id !== 'main-section' &&<div className="svg-icon delete-item addons-item">
+                                    {section.id !== 'main_section' &&<div className="svg-icon delete-item addons-item">
                                         <svg className='delete svg-button' role='button' onClick={()=>setAddItem(addItem.filter(val => val.index != section.index ))} viewBox="0 0 512 512"><path d="M289.94,256l95-95A24,24,0,0,0,351,127l-95,95-95-95A24,24,0,0,0,127,161l95,95-95,95A24,24,0,1,0,161,385l95-95,95,95A24,24,0,0,0,385,351Z"/></svg>
                                     </div>}
                                 </div>
@@ -584,27 +714,34 @@ const CourseForm = () => {
                                 <path fill='var(--Primary-color)' d="M159.999,83.99414h-112a12.01343,12.01343,0,0,0-12,12v112a12.01343,12.01343,0,0,0,12,12h112a12.01343,12.01343,0,0,0,12-12v-112A12.01343,12.01343,0,0,0,159.999,83.99414Zm4,124a4.00426,4.00426,0,0,1-4,4h-112a4.00427,4.00427,0,0,1-4-4v-112a4.00428,4.00428,0,0,1,4-4h112a4.00427,4.00427,0,0,1,4,4ZM140,40a4.0002,4.0002,0,0,1,4-4h16a4,4,0,0,1,0,8H144A4.0002,4.0002,0,0,1,140,40Zm80,8v8a4,4,0,0,1-8,0V48a4.00427,4.00427,0,0,0-4-4h-8a4,4,0,0,1,0-8h8A12.01343,12.01343,0,0,1,220,48Zm0,48v16a4,4,0,0,1-8,0V96a4,4,0,0,1,8,0Zm0,56v8a12.01343,12.01343,0,0,1-12,12h-8a4,4,0,0,1,0-8h8a4.00427,4.00427,0,0,0,4-4v-8a4,4,0,0,1,8,0ZM84,56V48A12.01343,12.01343,0,0,1,96,36h8a4,4,0,0,1,0,8H96a4.00427,4.00427,0,0,0-4,4v8a4,4,0,0,1-8,0Z"/>
                             </svg>
                         </span>
-                        {formSlideWidth > 0 && <span onClick={()=>handleNextBack('back')} role='button' className={nextForm ? "svg-icon next-form" :"svg-icon svg-button"}>
+                        {/*{formSlideWidth > 0 && <span onClick={()=>handleNextBack('back')} role='button' className="svg-icon svg-button">
                             <svg style={{'transform': 'rotate(180deg)'}} viewBox="0 0 16 16">
                                 <path fill='var(--Primary-color)' d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/>
                                 <path fill='var(--Primary-color)' d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>
                             </svg>
                         </span>}
-                        <span onClick={()=>handleNextBack('next')} role='button' className={nextForm ? "svg-icon next-form" :"svg-icon svg-button"}>
+                        <span onClick={()=>handleNextBack('next')} role='button' className="svg-icon svg-button">
                             <svg viewBox="0 0 16 16">
                                 <path fill='var(--Primary-color)' d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/>
                                 <path fill='var(--Primary-color)' d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>
                             </svg>
-                        </span>
+                        </span>*/}
                     </div>
                 </div>
-                <button type='submit'>submit</button>
+                <div className="submit">
+                    {!submited &&<button className={f1 + f2 + f3 + f4 === 4 ? 'btn-submit':'btn-submit disabled'} type='submit'>Create course</button>}
+                    {submited &&<div className='progress-bar'>
+                        <span style={{'transform':`scaleX(${parseInt(percentage) / 100})`}} className="progress-percentage"></span>
+                        <span className="progress-text">{percentage}%</span>
+                        <span className='progress-bytes'>{`${(parseFloat(loaded)/( 1024 * 1024)).toFixed(2)}MB of ${(parseFloat(total)/( 1024 * 1024)).toFixed(2)}MB`}</span>
+                    </div>}
+                </div>
             </form>
-            <div className={backPage ? "backPage active overpop":"backPage overpop"}>
+            <div className={backPage ? "overpop active blured-background":"overpop blured-background"}>
                 <div className="header">
                     <p className='text-xs'>Appearance</p>
                     <span onClick={()=>setActiveBox({...activeBox,backPage: false})} className="back svg-icon svg-button active">
-                        <svg style={{padding:".15rem"}} viewBox="0 0 476.213 476.213">
+                        <svg viewBox="0 0 476.213 476.213">
                             <polygon points="476.213,223.107 57.427,223.107 151.82,128.713 130.607,107.5 0,238.106 130.607,368.714 151.82,347.5 
                                 57.427,253.107 476.213,253.107 "/>
                         </svg>

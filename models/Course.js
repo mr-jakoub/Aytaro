@@ -37,7 +37,7 @@ const CourseSchema = new Schema({
     funds:[
         {
             price:{
-                type: Number,
+                type: String,
                 required: true
             },
             currency: {

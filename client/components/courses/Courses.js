@@ -4,7 +4,7 @@ import Course from "./Course"
 const Courses = ({ courses, filter = false }) => {
     return(
         <div className="posts">
-            <div className="header my-1">
+            <div className="header my-1 d-none">
                 <p className="text-sm svg-icon text-bold">Courses&nbsp;&nbsp;
                     <svg viewBox="0 0 512 512">
                         <g>

@@ -78,7 +78,6 @@ router.post('/', [ auth, [
         const profile = await Profile.findOne({ user: req.user.id })
         profile.courses.unshift({ course: course._id })
         await profile.save()
-
         res.json(course)
     } catch (err) {
         console.log(err.message)
