@@ -1,4 +1,5 @@
-node_modules/
-client/public/courses/
-.next/
-.swc/
+node_modules
+client/public/courses
+.next
+.swc
+package-lock.json

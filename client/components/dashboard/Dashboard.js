@@ -6,10 +6,11 @@ import Courses from '../courses/Courses'
 import fetchers from '../../utils/fetchers'
 import Popup from "./Popup"
 import Calendar from 'react-calendar'
+import Alert from "../layout/Alert"
 import moment from "moment"
 
 const Dashboard = ({ user }) =>{
-    const { logout, state, setState } = useStateContext()
+    const { logout, state, setState, alerts } = useStateContext()
     const [leftAside, setLeftAside] = useState(false)
     const [rightAside, setRightAside] = useState(false)
     const [languesDown, setLanguesDown] = useState(false)
@@ -37,7 +38,7 @@ const Dashboard = ({ user }) =>{
 
     // Calendar
     const [calendar, setCalendar] = useState(new Date())
-    let todosDates = [new Date("2022-08-7"),new Date("2022-08-25"),new Date("2022-08-28"),new Date("2022-08-13"),new Date("2022-08-03")]
+    let todosDates = [new Date("2022-09-9"),new Date("2022-09-25"),new Date("2022-09-28"),new Date("2022-09-13"),new Date("2022-09-03")]
 
     const tileClassName = ({date, view}) => {
     // Add class to tiles in month view only
@@ -90,13 +91,17 @@ const Dashboard = ({ user }) =>{
             </g>
         </svg>
     </div>
-    : courses === undefined || loggedIn === null ? <div style={navbarHeight > 0 ?{'top':`calc(${navbarHeight}px + 40px)`,'opacity':'1'}:{'top':`100px)`,'opacity':'1'}} className="body-loader">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div> :
+    : courses === undefined || loggedIn === null ? 
+        <div style={navbarHeight > 0 ?{'top':`calc(${navbarHeight}px + 40px)`,'opacity':'1'}:{'top':`100px)`,'opacity':'1'}} className="body-loader">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div> :
         <>
-        <Popup popupForm={popupForm} handlePopupForm={setPopupForm} />
+            <Popup popupForm={popupForm} handlePopupForm={setPopupForm} />
+            {alerts.length > 0 && <div className="alerts">
+                <Alert alerts={alerts} />
+            </div>}
             <aside className={leftAside ?"blured-background show oldside":"blured-background oldside"}>
                 <span onClick={()=>{setLeftAside(!leftAside);setRightAside(false)}} className={leftAside ? "toggle svg-icon show": "toggle svg-icon"}>
                     <svg viewBox="0 0 330 330">

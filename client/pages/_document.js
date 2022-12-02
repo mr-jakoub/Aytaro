@@ -2,14 +2,13 @@ import { Html, Head, Main, NextScript } from 'next/document'
 
 export default function Document() {
   return (
-    <Html id='aytaro' lang='en' dir='ltr'>
+    <Html id='yonefo' lang='en' dir='ltr'>
       <Head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap-grid.min.css" as="style" />
       </Head>
       <body>
         <Main/>
-        <NextScript id='yaakoub' />
-        
+        <NextScript />
       </body>
     </Html>
   )

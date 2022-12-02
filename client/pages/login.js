@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { useStateContext } from "../context/StateContext"
 import Alert from "../components/layout/Alert"
 import fetchers from "../utils/fetchers"
+import LoadingBar from 'react-top-loading-bar'
 
 const Login = () =>{
     const { alerts, login } = useStateContext()
@@ -30,12 +31,13 @@ const Login = () =>{
         if (process.browser) sessionStorage.setItem("loggedIn", "start")
         router.push('/')
     }
+    const [loadingProgress, setLoadingProgress] = useState(100)
 
-    return data === undefined || getCookie('token') ? <h1>Loading...</h1> :
+    return data === undefined || getCookie('token') ? <LoadingBar color='var(--Primary-color)' shadow={true} progress={loadingProgress} onLoaderFinished={() => setLoadingProgress(0)} /> :
         <>
-        <div className="alerts">
+        {alerts.length > 0 && <div className="alerts">
             <Alert alerts={alerts} />
-        </div>
+        </div>}
         <div className="register">
             <div className="content">
                 <div className="box">

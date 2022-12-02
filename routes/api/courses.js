@@ -29,6 +29,7 @@ router.post('/', [ auth, [
     }
     try {
         const user = await User.findById(req.user.id).select('-password')
+        const profile = await Profile.findOne({ user: req.user.id })
         const { title, description, categories, language, requirements, willLearn, funds, level, coupons, sections } = req.body
         // Fill Course fields
         const courseFields = { user: user.id, avatar: user.avatar, name: user.name, title, description, coupons, level }
@@ -44,12 +45,13 @@ router.post('/', [ auth, [
         if(requirements) courseFields.requirements = requirements
         if(willLearn) courseFields.willLearn = willLearn
         // Thumbnail
-        const courseId = uuid.v4()
-        const courseDir = `./client/public/courses/course@${courseId}&&user@${user.id}`
+        console.log(profile.courses,profile.courses.length)
+        const courseId = profile.courses.length + 1
+        const courseDir = `./client/public/courses/${user.id}@${courseId}`
         if(!fs.existsSync(courseDir)){
             await fs.mkdirSync(courseDir)
-            await req.files.thumbnail.mv(`./client/public/courses/course@${courseId}&&user@${user.id}/${req.files.thumbnail.name.replaceAll(' ','')}`)
-            courseFields.thumbnail = `/courses/course@${courseId}&&user@${user.id}/${req.files.thumbnail.name.replaceAll(' ','')}`
+            await req.files.thumbnail.mv(`./client/public/courses/${user.id}@${courseId}/${req.files.thumbnail.name.replaceAll(' ','')}`)
+            courseFields.thumbnail = `/courses/${user.id}@${courseId}/${req.files.thumbnail.name.replaceAll(' ','')}`
             // Build sections [{...},{...}]
             courseFields.sections = JSON.parse(sections)
             // Build videos
@@ -59,12 +61,12 @@ router.post('/', [ auth, [
                     console.log(req.files[item])
                     // Check if there is more than 1 video
                     if(req.files[item][key]){
-                        video.directory = `/courses/course@${courseId}&&user@${user.id}/${req.files[item][key].name.replaceAll(' ','')}`
-                        req.files[item][key].mv(`./client/public/courses/course@${courseId}&&user@${user.id}/${req.files[item][key].name.replaceAll(' ','')}`)
+                        video.directory = `/courses/${user.id}@${courseId}/${req.files[item][key].name.replaceAll(' ','')}`
+                        req.files[item][key].mv(`./client/public/courses/${user.id}@${courseId}/${req.files[item][key].name.replaceAll(' ','')}`)
                     }else{
                         // If there is 1 video no need to the key
-                        video.directory = `/courses/course@${courseId}&&user@${user.id}/${req.files[item].name.replaceAll(' ','')}`
-                        await req.files[item].mv(`./client/public/courses/course@${courseId}&&user@${user.id}/${req.files[item].name.replaceAll(' ','')}`)
+                        video.directory = `/courses/${user.id}@${courseId}/${req.files[item].name.replaceAll(' ','')}`
+                        await req.files[item].mv(`./client/public/courses/${user.id}@${courseId}/${req.files[item].name.replaceAll(' ','')}`)
                     }
                 })
             })
@@ -75,7 +77,6 @@ router.post('/', [ auth, [
         const course = await newCourse.save()
 
         // Add course to /profile/courses
-        const profile = await Profile.findOne({ user: req.user.id })
         profile.courses.unshift({ course: course._id })
         await profile.save()
         res.json(course)
@@ -120,6 +121,8 @@ router.delete('/:id', auth, async (req,res)=>{
         if(course.user.toString() !== req.user.id){
             return res.status(401).json({ msg: 'You are not authorized' })
         }
+        // Remove old image
+        //fs.unlinkSync(`client/public/${user.avatar}`)
         await course.remove()
         res.json({ msg: 'Your course permanently deleted !' })
     } catch (err) {

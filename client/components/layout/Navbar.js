@@ -6,6 +6,10 @@ import { useStateContext } from "../../context/StateContext"
 
 const Navbar = ({ user }) => {
     const { logout } = useStateContext()
+    let handleLogout = () =>{
+        setDropDownMenu(0)
+        logout()
+    }
     const [backPage, setBackPage] = useState(false)
     // Start dark mode
     const [darkMode, setDarkMode] = useState(true)
@@ -329,7 +333,7 @@ const Navbar = ({ user }) => {
                             <span>Rate us</span>
                         </div>
                     </li>
-                    <li role='button' className="drop-down-item svg-button" onClick={()=>logout()}>
+                    <li role='button' className="drop-down-item svg-button" onClick={handleLogout}>
                         <div className="wrapper">
                             <span className="nav-link">
                                 <svg viewBox="0 0 511.989 511.989">
