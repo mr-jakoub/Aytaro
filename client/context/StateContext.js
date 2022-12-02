@@ -107,8 +107,17 @@ export const StateContext = ({ children }) =>{
         }
         try {
             await axios.post('http://localhost:5000/api/courses', formData, config)
-            setAlert('Course created Successfully','success')
+            setAlert('Course Created Successfully','success')
             return config.onUploadProgress
+        } catch (err) {
+            setAlert(err.response.statusText,'danger')
+        }
+    }
+    // Delete course
+    const deleteCourse = async (courseId) => {
+        try {
+            await axios.delete(`http://localhost:5000/api/courses/${courseId}`)
+            setAlert('Your course permanently deleted !','danger')
         } catch (err) {
             setAlert(err.response.statusText,'danger')
         }
@@ -131,7 +140,8 @@ export const StateContext = ({ children }) =>{
             
             // Courses
             addRise,
-            addCourse
+            addCourse,
+            deleteCourse
         }}>
             {children}
         </Context.Provider>

@@ -11,9 +11,9 @@ import Image from 'next/image'
 import fetchers from '../../utils/fetchers'
 
 
-const Course = ({course, addComment, comments, profileCourses = false, deleteCourse, addLike}) => {
+const Course = ({course, addComment, comments, profileCourses = false, addLike}) => {
     const user = useSWR('/api/auth', fetchers.loadUser).data
-    const { addRise } = useStateContext()
+    const { addRise, deleteCourse } = useStateContext()
     /* Client side rise -- seems realtime -- */
     let risedCourse = user && course.rises.filter(rise=> rise.user.toString() === user._id).length > 0
     const [rises, setRises] = useState({
@@ -188,7 +188,7 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
                             </>
                         ):(
                         <>
-                            <li className="svg-icon">
+                            <li onClick={()=>deleteCourse(course._id)} className="svg-icon">
                                 <svg viewBox="0 0 407.521 407.521">
                                     <g>
                                         <g>
@@ -235,7 +235,7 @@ const Course = ({course, addComment, comments, profileCourses = false, deleteCou
                     </div>
                 </div>
                 <div className="body">
-                    <p className="title">{course.title}</p>
+                    <p className="title">{course.title.split('@')[0]}</p>
                     <div className='thumbnail'>
                         {/* <img src={course.thumbnail} alt="thumbnail" /> */}
                         <Image

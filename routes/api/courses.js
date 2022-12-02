@@ -29,7 +29,6 @@ router.post('/', [ auth, [
     }
     try {
         const user = await User.findById(req.user.id).select('-password')
-        const profile = await Profile.findOne({ user: req.user.id })
         const { title, description, categories, language, requirements, willLearn, funds, level, coupons, sections } = req.body
         // Fill Course fields
         const courseFields = { user: user.id, avatar: user.avatar, name: user.name, title, description, coupons, level }
@@ -45,8 +44,9 @@ router.post('/', [ auth, [
         if(requirements) courseFields.requirements = requirements
         if(willLearn) courseFields.willLearn = willLearn
         // Thumbnail
-        console.log(profile.courses,profile.courses.length)
-        const courseId = profile.courses.length + 1
+        const courseId = uuid.v4()
+        // pass the folderId to the title to use it whene we delete it
+        courseFields.title = `${title}@${courseId}`
         const courseDir = `./client/public/courses/${user.id}@${courseId}`
         if(!fs.existsSync(courseDir)){
             await fs.mkdirSync(courseDir)
@@ -71,12 +71,12 @@ router.post('/', [ auth, [
                 })
             })
         }
-        console.log(JSON.stringify(courseFields.sections))
 
         const newCourse = new Course(courseFields)
         const course = await newCourse.save()
 
         // Add course to /profile/courses
+        const profile = await Profile.findOne({ user: req.user.id })
         profile.courses.unshift({ course: course._id })
         await profile.save()
         res.json(course)
@@ -116,15 +116,22 @@ router.put('/rise/:id', auth, async (req,res)=>{
 router.delete('/:id', auth, async (req,res)=>{
     try {
         const course = await Course.findById(req.params.id)
+        const profile = await Profile.findOne({ user: req.user.id })
+        const courseId = course.title.split('@')[1]
         if(!course) return res.status(404).json({ msg: 'Course not found !' })
         // Check if the owner of the course who will delete it
         if(course.user.toString() !== req.user.id){
             return res.status(401).json({ msg: 'You are not authorized' })
         }
-        // Remove old image
-        //fs.unlinkSync(`client/public/${user.avatar}`)
+        // Remove course folder
+        fs.rmSync(`./client/public/courses/${req.user.id}@${courseId}`, { recursive: true, force: true })
+        // Remove from profile courses
+        const removeIndex = profile.courses.map(crs=> crs.course.toString()).indexOf(req.params.id)
+        profile.courses.splice(removeIndex, 1)
+        await profile.save()
         await course.remove()
         res.json({ msg: 'Your course permanently deleted !' })
+        return res.json(profile.courses)
     } catch (err) {
         if(err.kind == 'ObjectId'){
             return res.status(400).json({ msg: 'Course not found !' })
